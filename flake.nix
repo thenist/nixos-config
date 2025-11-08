@@ -16,13 +16,16 @@
     nixosConfigurations.tondemo = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        ./configuration.nix
+        ./common.nix
+        ./hosts/tondemo/configuration.nix
+        ./hosts/tondemo/hardware-configuration.nix
+        ./users/thenist/user.nix
         home-manager.nixosModules.home-manager
         {
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
-            users.thenist = import ./home.nix;
+            users.thenist = import ./users/thenist/home.nix;
             backupFileExtension = "backup";
           };
         }

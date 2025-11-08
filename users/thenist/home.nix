@@ -9,7 +9,6 @@
     gnomeExtensions.search-light
     gnomeExtensions.blur-my-shell
     gnomeExtensions.dash-to-dock
-    prismlauncher
   ];
 
   gtk = {
