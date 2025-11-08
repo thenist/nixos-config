@@ -51,6 +51,10 @@
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
+  # Exclude xterm and tour
+  environment.gnome.excludePackages = [ pkgs.gnome-tour ];
+  services.xserver.excludePackages = [ pkgs.xterm ];
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "kr";
