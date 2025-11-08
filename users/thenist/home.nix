@@ -7,8 +7,8 @@
 
   home.packages = with pkgs; [
     gnomeExtensions.search-light
-    gnomeExtensions.blur-my-shell
     gnomeExtensions.dash-to-dock
+    gnomeExtensions.open-bar
   ];
 
   gtk = {
@@ -36,8 +36,8 @@
     "org/gnome/shell" = {
       enabled-extensions = [
         "search-light@icedman.github.com"
-        "blur-my-shell@aunetx"
         "dash-to-dock@micxgx.gmail.com"
+        "openbar@neuromorph"
       ];
     };
 
@@ -54,6 +54,10 @@
       color-shading-type = "solid";
       picture-options = "zoom";
       picture-uri-dark = "file://${config.home.homeDirectory}/.wallpaper.png";
+    };
+
+    "org/gnome/shell/extensions/openbar" = {
+      bartype = "Trilands";
     };
   };
 
