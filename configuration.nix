@@ -105,6 +105,12 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # Install fonts.
+  fonts.packages = with pkgs; [
+    nanum
+    noto-fonts-cjk-sans
+  ];
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
