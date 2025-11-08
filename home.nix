@@ -48,5 +48,13 @@
     "org/gnome/desktop/wm/preferences" = {
       button-layout = "minimize,maximize,close";
     };
+
+    "org/gnome/desktop/background" = {
+      color-shading-type = "solid";
+      picture-options = "zoom";
+      picture-uri-dark = "file://${config.home.homeDirectory}/.wallpaper.png";
+    };
   };
+
+  home.file.".wallpaper.png".source = ./wallpaper.png;
 }
