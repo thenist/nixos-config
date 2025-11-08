@@ -8,6 +8,7 @@
   home.packages = with pkgs; [
     gnomeExtensions.search-light
     gnomeExtensions.blur-my-shell
+    prismlauncher
   ];
 
   gtk = {
