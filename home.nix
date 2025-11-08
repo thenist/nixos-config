@@ -38,8 +38,10 @@
         "blur-my-shell@aunetx"
       ];
     };
+
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
+      show-battery-percentage = true;
     };
   };
 }
