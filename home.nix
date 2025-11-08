@@ -8,6 +8,7 @@
   home.packages = with pkgs; [
     gnomeExtensions.search-light
     gnomeExtensions.blur-my-shell
+    gnomeExtensions.dash-to-dock
     prismlauncher
   ];
 
@@ -37,6 +38,7 @@
       enabled-extensions = [
         "search-light@icedman.github.com"
         "blur-my-shell@aunetx"
+        "dash-to-dock@micxgx.gmail.com"
       ];
     };
 
