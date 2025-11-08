@@ -87,6 +87,15 @@
     ];
   };
 
+  # Install and configure ibus for hangul input.
+  i18n.inputMethod = {
+    type = "ibus";
+    enable = true;
+    ibus.engines = with pkgs.ibus-engines; [
+      hangul
+    ];
+  };
+
   # Install firefox.
   programs.firefox.enable = true;
 
