@@ -41,8 +41,11 @@
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
-  # Exclude xterm and tour
-  environment.gnome.excludePackages = [ pkgs.gnome-tour ];
+  # Exclude xterm,tour and epiphany
+  environment.gnome.excludePackages = [ 
+    pkgs.gnome-tour
+    pkgs.epiphany
+  ];
   services.xserver.excludePackages = [ pkgs.xterm ];
 
   # Configure keymap in X11
