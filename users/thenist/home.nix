@@ -9,6 +9,7 @@
     gnomeExtensions.search-light
     gnomeExtensions.dash-to-dock
     gnomeExtensions.open-bar
+    gnomeExtensions.coverflow-alt-tab
   ];
 
   gtk = {
@@ -38,6 +39,7 @@
         "search-light@icedman.github.com"
         "dash-to-dock@micxgx.gmail.com"
         "openbar@neuromorph"
+        "CoverflowAltTab@palatis.blogspot.com"
       ];
     };
 
