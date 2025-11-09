@@ -5,6 +5,10 @@
   home.homeDirectory = "/home/thenist";
   home.stateVersion = "25.05";
 
+  programs.vscode = {
+    enable = true;
+  };
+
   home.packages = with pkgs; [
     gnomeExtensions.search-light
     gnomeExtensions.dash-to-dock
