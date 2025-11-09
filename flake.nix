@@ -31,5 +31,23 @@
         }
       ];
     };
+    nixosConfigurations.wonderz = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./common.nix
+        ./hosts/wonderz/configuration.nix
+        ./hosts/wonderz/hardware-configuration.nix
+        ./users/thenist/user.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.thenist = import ./users/thenist/home.nix;
+            backupFileExtension = "backup";
+          };
+        }
+      ];
+    };
   };
 }
