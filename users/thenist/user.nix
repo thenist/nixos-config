@@ -13,6 +13,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       prismlauncher
+      freecad
     ];
   };
 }
