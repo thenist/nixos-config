@@ -56,7 +56,7 @@
     };
 
     "org/gnome/desktop/wm/preferences" = {
-      button-layout = "minimize,maximize,close";
+      button-layout = ":minimize,maximize,close";
     };
 
     "org/gnome/desktop/background" = {
