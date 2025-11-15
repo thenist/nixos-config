@@ -10,13 +10,4 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "tondemo"; # Define your hostname.
-
-  hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs; [
-      vaapiIntel
-      intel-media-driver
-    ];
-  };
-  environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
 }
