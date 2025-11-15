@@ -86,7 +86,10 @@
   };
 
   # Install firefox.
-  programs.firefox.enable = true;
+  programs.firefox = {
+    enable = true;
+    languagePacks = [ "ko" "en-US" ];
+  };
 
   # Install git.
   programs.git.enable = true;
