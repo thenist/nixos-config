@@ -14,6 +14,7 @@
     gnomeExtensions.dash-to-dock
     gnomeExtensions.open-bar
     gnomeExtensions.coverflow-alt-tab
+    gnomeExtensions.no-overview
   ];
 
   gtk = {
@@ -45,6 +46,7 @@
         "dash-to-dock@micxgx.gmail.com"
         "openbar@neuromorph"
         "CoverflowAltTab@palatis.blogspot.com"
+        "no-overview@fthx"
       ];
     };
 
