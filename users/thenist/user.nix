@@ -15,6 +15,7 @@
       prismlauncher
       freecad
       orca-slicer
+      discord
     ];
   };
 }
