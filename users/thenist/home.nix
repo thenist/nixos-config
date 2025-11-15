@@ -39,6 +39,7 @@
 
   dconf.settings = {
     "org/gnome/shell" = {
+      disable-user-extensions = false;
       enabled-extensions = [
         "search-light@icedman.github.com"
         "dash-to-dock@micxgx.gmail.com"
