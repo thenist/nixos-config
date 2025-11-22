@@ -111,6 +111,8 @@
      btop
      unzip
      exfat
+     ffmpeg
+     python312Full
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
