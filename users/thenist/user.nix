@@ -16,6 +16,7 @@
       freecad
       orca-slicer
       discord
+      logseq
     ];
   };
 }
