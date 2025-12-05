@@ -113,6 +113,7 @@
      exfat
      ffmpeg
      python312
+     gcc
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
