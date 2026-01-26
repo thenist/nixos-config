@@ -119,6 +119,7 @@
      ffmpeg
      python312
      gcc
+     openal
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
