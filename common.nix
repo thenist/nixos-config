@@ -5,6 +5,9 @@
 { config, pkgs, ... }:
 
 {
+  nixpkgs.overlays = [
+    (import ./overlays/default.nix)
+  ];
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -93,7 +96,7 @@
 
   programs.java = {
     enable = true;
-    package = (pkgs.jdk21.override { enableJavaFX = true; });
+    package = (pkgs.jdk17.override { enableJavaFX = true; });
   };
 
   # Install git.
@@ -119,7 +122,7 @@
      ffmpeg
      python312
      gcc
-     openal
+     jportaudio
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
