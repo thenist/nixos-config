@@ -123,6 +123,7 @@
      python312
      gcc
      jportaudio
+     unrar
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
