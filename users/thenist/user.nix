@@ -17,6 +17,7 @@
       orca-slicer
       discord
       logseq
+      qbittorrent
     ];
   };
 }
