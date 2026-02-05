@@ -14,6 +14,7 @@
     packages = with pkgs; [
       prismlauncher
       freecad
+      kicad
       orca-slicer
       discord
       logseq
