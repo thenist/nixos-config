@@ -19,6 +19,7 @@
       discord
       logseq
       qbittorrent
+      opencode
     ];
   };
 }
