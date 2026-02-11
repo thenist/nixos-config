@@ -124,6 +124,7 @@
      gcc
      jportaudio
      unrar
+     nodejs_24
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
