@@ -122,6 +122,7 @@
      ffmpeg
      python312
      gcc
+     portaudio
      jportaudio
      unrar
      nodejs_24
