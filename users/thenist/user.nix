@@ -20,6 +20,7 @@
       logseq
       qbittorrent
       opencode
+      norminette
     ];
   };
 }
