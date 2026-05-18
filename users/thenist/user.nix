@@ -21,6 +21,7 @@
       qbittorrent
       opencode
       norminette
+      ollama
     ];
   };
 }
