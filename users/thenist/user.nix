@@ -17,7 +17,6 @@
       kicad
       orca-slicer
       discord
-      logseq
       qbittorrent
       opencode
       norminette

@@ -3,7 +3,7 @@
 {
   home.username = "thenist";
   home.homeDirectory = "/home/thenist";
-  home.stateVersion = "25.05";
+  home.stateVersion = "26.05";
 
   programs.vscode = {
     enable = true;
