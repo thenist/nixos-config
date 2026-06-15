@@ -10,6 +10,11 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    driftwm = {
+      url = "github:malbiruk/driftwm/v0.11.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, nixos-hardware, ... }@inputs: {
@@ -17,6 +22,7 @@
     # it's a better practice than "default" shown in the video
     nixosConfigurations.tondemo = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
+      specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
         ./hosts/tondemo/configuration.nix
@@ -36,6 +42,7 @@
     };
     nixosConfigurations.wonderz = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
+      specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
         ./hosts/wonderz/configuration.nix

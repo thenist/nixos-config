@@ -2,8 +2,17 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
+let
+  system = pkgs.stdenv.hostPlatform.system;
+  driftwm = inputs.driftwm.packages.${system}.default;
+  quickshellGreeter = pkgs.writeShellScript "quickshell-greeter" ''
+    export QT_QPA_PLATFORM=wayland
+    export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+    exec ${pkgs.cage}/bin/cage -- ${pkgs.quickshell}/bin/quickshell -p /etc/quickshell/greeter/shell.qml
+  '';
+in
 {
   nixpkgs.overlays = [
     (import ./overlays/default.nix)
@@ -37,25 +46,37 @@
     LC_TIME = "ko_KR.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the GNOME Desktop Environment.
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
-
-  # Exclude xterm,tour and epiphany
-  environment.gnome.excludePackages = [ 
-    pkgs.gnome-tour
-    pkgs.epiphany
-  ];
-  services.xserver.excludePackages = [ pkgs.xterm ];
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "kr";
-    variant = "kr104";
+  # driftwm is launched from the Quickshell greeter through greetd.
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${quickshellGreeter}";
+      user = "greeter";
+    };
   };
+
+  services.displayManager.sessionPackages = [ driftwm ];
+  environment.etc."quickshell/greeter".source = ./quickshell/greeter;
+
+  services.dbus.enable = true;
+  security.polkit.enable = true;
+  security.pam.services.quickshell-lock = {};
+  programs.dconf.enable = true;
+
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+    configPackages = [ driftwm ];
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gtk
+      xdg-desktop-portal-wlr
+    ];
+  };
+
+  services.gvfs.enable = true;
+  services.udisks2.enable = true;
+  services.tumbler.enable = true;
+  services.upower.enable = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -114,8 +135,8 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-     wget
+      vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+      wget
      btop
      unzip
      exfat
@@ -125,8 +146,32 @@
      portaudio
      jportaudio
      unrar
-     nodejs_24
-     gnumake
+      nodejs_24
+      gnumake
+      driftwm
+      quickshell
+      cage
+      xwayland-satellite
+      xdg-desktop-portal
+      xdg-desktop-portal-gtk
+      xdg-desktop-portal-wlr
+      foot
+      fuzzel
+      mako
+      swayidle
+      grim
+      slurp
+      wl-clipboard
+      brightnessctl
+      pavucontrol
+      networkmanagerapplet
+      polkit_gnome
+      wlr-randr
+      wdisplays
+      thunar
+      adwaita-fonts
+      libnotify
+      playerctl
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
