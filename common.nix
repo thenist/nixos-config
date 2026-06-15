@@ -130,6 +130,8 @@ in
   fonts.packages = with pkgs; [
     nanum
     noto-fonts-cjk-sans
+    adwaita-fonts
+    nerd-fonts.jetbrains-mono
   ];
 
   # List packages installed in system profile. To search, run:

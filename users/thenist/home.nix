@@ -31,10 +31,15 @@
     path = "~/.wallpaper.png"
 
     [decorations]
+    bg_color = "#11131a"
+    fg_color = "#cad3f5"
     border_width = 1
     border_color = "#2c2f36"
     border_color_focused = "#8aadf4"
     corner_radius = 10
+    font = "Adwaita Sans"
+    font_size = 11
+    font_weight = "medium"
 
     [keybindings]
     "mod+return" = "exec foot"
@@ -52,6 +57,15 @@
 
   xdg.configFile."quickshell/panel".source = ./quickshell/panel;
   xdg.configFile."quickshell/lock".source = ./quickshell/lock;
+
+  xdg.configFile."foot/foot.ini".text = ''
+    [main]
+    font=JetBrainsMono Nerd Font:size=11
+    font-bold=JetBrainsMono Nerd Font:style=Bold:size=11
+    font-italic=JetBrainsMono Nerd Font:style=Italic:size=11
+    font-bold-italic=JetBrainsMono Nerd Font:style=Bold Italic:size=11
+    pad=10x8
+  '';
 
   xdg.configFile."fuzzel/fuzzel.ini".text = ''
     font=Adwaita Sans:size=12
