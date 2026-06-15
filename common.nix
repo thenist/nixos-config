@@ -104,6 +104,7 @@ in
   i18n.inputMethod = {
     type = "ibus";
     enable = true;
+    ibus.waylandFrontend = true;
     ibus.engines = with pkgs.ibus-engines; [
       hangul
     ];

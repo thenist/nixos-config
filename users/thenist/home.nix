@@ -1,5 +1,16 @@
 { config, pkgs, ... }:
 
+let
+  ibusPackage = pkgs.ibus-with-plugins.override {
+    plugins = with pkgs.ibus-engines; [ hangul ];
+  };
+  driftwmIbusStart = pkgs.writeShellScript "driftwm-ibus-start" ''
+    export XMODIFIERS=@im=ibus
+    ${pkgs.systemd}/bin/systemctl --user unset-environment GTK_IM_MODULE QT_IM_MODULE || true
+    ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd XMODIFIERS
+    exec ${ibusPackage}/libexec/ibus-ui-gtk3 --enable-wayland-im --exec-daemon --daemon-args "--xim --panel disable"
+  '';
+in
 {
   home.username = "thenist";
   home.homeDirectory = "/home/thenist";
@@ -11,12 +22,16 @@
 
   xdg.configFile."driftwm/config.toml".text = ''
     autostart = [
+      "${driftwmIbusStart}",
       "quickshell -p ~/.config/quickshell/panel/shell.qml",
       "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1",
       "nm-applet",
       "mako",
       "swayidle -w timeout 600 'quickshell -n -p ~/.config/quickshell/lock/shell.qml' before-sleep 'sh -c \"quickshell -n -d -p ~/.config/quickshell/lock/shell.qml; sleep 1\"'"
     ]
+
+    [env]
+    XMODIFIERS = "@im=ibus"
 
     [input.keyboard]
     layout = "kr"
@@ -57,6 +72,13 @@
 
   xdg.configFile."quickshell/panel".source = ./quickshell/panel;
   xdg.configFile."quickshell/lock".source = ./quickshell/lock;
+
+  xdg.configFile."autostart/ibus-daemon.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=IBus
+    Hidden=true
+  '';
 
   xdg.configFile."foot/foot.ini".text = ''
     [main]
