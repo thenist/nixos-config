@@ -3,6 +3,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
+import Quickshell.Services.UPower
 import Quickshell.Widgets
 
 ShellRoot {
@@ -12,6 +13,47 @@ ShellRoot {
 
   function run(command) {
     Quickshell.execDetached(["sh", "-c", command]);
+  }
+
+  function hasBattery() {
+    const battery = UPower.displayDevice;
+    return battery && battery.ready && battery.isPresent && battery.type === UPowerDeviceType.Battery;
+  }
+
+  function batteryPercent() {
+    return root.hasBattery() ? Math.round(UPower.displayDevice.percentage) : 0;
+  }
+
+  function batteryLabel() {
+    if (!root.hasBattery()) {
+      return "";
+    }
+
+    const battery = UPower.displayDevice;
+    const percent = root.batteryPercent();
+
+    if (battery.state === UPowerDeviceState.Charging || battery.state === UPowerDeviceState.PendingCharge) {
+      return "chg " + percent + "%";
+    }
+
+    if (battery.state === UPowerDeviceState.FullyCharged) {
+      return "full";
+    }
+
+    return "bat " + percent + "%";
+  }
+
+  function batteryColor() {
+    if (!root.hasBattery()) {
+      return "#181b25";
+    }
+
+    const battery = UPower.displayDevice;
+    if (battery.state === UPowerDeviceState.Charging || battery.state === UPowerDeviceState.PendingCharge) {
+      return "#263026";
+    }
+
+    return root.batteryPercent() <= 15 ? "#3a2028" : "#181b25";
   }
 
   Timer {
@@ -124,12 +166,111 @@ ShellRoot {
             }
           }
 
+          StatusPill {
+            visible: root.hasBattery()
+            label: root.batteryLabel()
+            color: root.batteryColor()
+          }
+
           ActionPill {
             label: "lock"
             onClicked: root.run("quickshell -n -p ~/.config/quickshell/lock/shell.qml")
           }
+
+          ActionPill {
+            id: powerButton
+
+            label: "power"
+            onClicked: powerMenu.visible = !powerMenu.visible
+          }
         }
       }
+
+      PopupWindow {
+        id: powerMenu
+
+        color: "transparent"
+        visible: false
+        grabFocus: true
+        implicitWidth: powerMenuContent.implicitWidth
+        implicitHeight: powerMenuContent.implicitHeight
+
+        anchor {
+          window: powerButton.QsWindow.window
+          adjustment: PopupAdjustment.Slide
+          gravity: Edges.Bottom | Edges.Right
+
+          onAnchoring: {
+            const pos = powerButton.QsWindow.contentItem.mapFromItem(
+              powerButton,
+              powerButton.width - powerMenu.width,
+              powerButton.height + 8
+            );
+
+            anchor.rect.x = pos.x;
+            anchor.rect.y = pos.y;
+          }
+        }
+
+        Rectangle {
+          id: powerMenuContent
+
+          implicitWidth: 132
+          implicitHeight: powerMenuColumn.implicitHeight + 14
+          radius: 14
+          color: "#11131af2"
+          border.width: 1
+          border.color: "#2f3344"
+
+          Column {
+            id: powerMenuColumn
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 4
+
+            PowerMenuItem {
+              label: "suspend"
+              command: "systemctl suspend"
+              menu: powerMenu
+            }
+
+            PowerMenuItem {
+              label: "reboot"
+              command: "systemctl reboot"
+              menu: powerMenu
+            }
+
+            PowerMenuItem {
+              label: "shutdown"
+              command: "systemctl poweroff"
+              menu: powerMenu
+              destructive: true
+            }
+          }
+        }
+      }
+    }
+  }
+
+  component StatusPill: Rectangle {
+    id: pill
+
+    property string label: ""
+
+    width: text.implicitWidth + 22
+    height: 28
+    radius: 14
+
+    Text {
+      id: text
+
+      anchors.centerIn: parent
+      text: pill.label
+      color: "#cad3f5"
+      font.pixelSize: 13
+      font.weight: Font.DemiBold
     }
   }
 
@@ -158,6 +299,42 @@ ShellRoot {
       anchors.fill: parent
       cursorShape: Qt.PointingHandCursor
       onClicked: pill.clicked()
+    }
+  }
+
+  component PowerMenuItem: Rectangle {
+    id: item
+
+    required property string label
+    required property string command
+    required property var menu
+    property bool destructive: false
+
+    width: parent ? parent.width : 0
+    height: 30
+    color: mouse.containsMouse ? "#242838" : "transparent"
+
+    Text {
+      anchors.left: parent.left
+      anchors.leftMargin: 14
+      anchors.verticalCenter: parent.verticalCenter
+      text: item.label
+      color: item.destructive ? "#ed8796" : "#cad3f5"
+      font.pixelSize: 13
+      font.weight: Font.DemiBold
+    }
+
+    MouseArea {
+      id: mouse
+
+      anchors.fill: parent
+      hoverEnabled: true
+      cursorShape: Qt.PointingHandCursor
+
+      onClicked: {
+        item.menu.visible = false;
+        root.run(item.command);
+      }
     }
   }
 }
