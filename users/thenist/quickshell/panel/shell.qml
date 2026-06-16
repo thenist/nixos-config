@@ -104,7 +104,8 @@ ShellRoot {
 
               onClicked: function(mouse) {
                 if (mouse.button === Qt.RightButton && trayItem.modelData.hasMenu) {
-                  trayItem.modelData.display(panel, trayItem.x, trayItem.y + trayItem.height);
+                  const pos = trayItem.mapToItem(panel.contentItem, 0, trayItem.height);
+                  trayItem.modelData.display(panel, Math.round(pos.x), Math.round(pos.y));
                 } else {
                   trayItem.modelData.activate();
                 }
