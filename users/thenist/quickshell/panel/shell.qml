@@ -54,6 +54,10 @@ ShellRoot {
   }
 
   function batteryCharging() {
+    if (UPower.onBattery) {
+      return false;
+    }
+
     const batteries = root.batteries();
 
     for (let i = 0; i < batteries.length; i++) {
