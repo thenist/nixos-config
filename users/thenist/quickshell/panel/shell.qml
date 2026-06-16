@@ -15,13 +15,70 @@ ShellRoot {
     Quickshell.execDetached(["sh", "-c", command]);
   }
 
+  function batteries() {
+    const devices = UPower.devices.values;
+    const batteries = [];
+
+    for (let i = 0; i < devices.length; i++) {
+      const device = devices[i];
+      if (device && device.ready && device.isPresent && device.type === UPowerDeviceType.Battery && device.powerSupply) {
+        batteries.push(device);
+      }
+    }
+
+    return batteries;
+  }
+
   function hasBattery() {
-    const battery = UPower.displayDevice;
-    return battery && battery.ready && battery.isPresent && battery.type === UPowerDeviceType.Battery;
+    return root.batteries().length > 0;
   }
 
   function batteryPercent() {
-    return root.hasBattery() ? Math.round(UPower.displayDevice.percentage) : 0;
+    const batteries = root.batteries();
+    let charge = 0;
+    let capacity = 0;
+
+    for (let i = 0; i < batteries.length; i++) {
+      const battery = batteries[i];
+
+      if (battery.energyCapacity > 0) {
+        charge += Math.max(0, battery.energy);
+        capacity += battery.energyCapacity;
+      } else {
+        charge += Math.max(0, battery.percentage);
+        capacity += 100;
+      }
+    }
+
+    return capacity > 0 ? Math.round(charge / capacity * 100) : 0;
+  }
+
+  function batteryCharging() {
+    const batteries = root.batteries();
+
+    for (let i = 0; i < batteries.length; i++) {
+      const state = batteries[i].state;
+      if (state === UPowerDeviceState.Charging || state === UPowerDeviceState.PendingCharge) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function batteryFull() {
+    const batteries = root.batteries();
+    if (batteries.length === 0) {
+      return false;
+    }
+
+    for (let i = 0; i < batteries.length; i++) {
+      if (batteries[i].state !== UPowerDeviceState.FullyCharged) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   function batteryLabel() {
@@ -29,18 +86,15 @@ ShellRoot {
       return "";
     }
 
-    const battery = UPower.displayDevice;
-    const percent = root.batteryPercent();
-
-    if (battery.state === UPowerDeviceState.Charging || battery.state === UPowerDeviceState.PendingCharge) {
-      return "chg " + percent + "%";
+    if (root.batteryCharging()) {
+      return "chg " + root.batteryPercent() + "%";
     }
 
-    if (battery.state === UPowerDeviceState.FullyCharged) {
+    if (root.batteryFull()) {
       return "full";
     }
 
-    return "bat " + percent + "%";
+    return "bat " + root.batteryPercent() + "%";
   }
 
   function batteryColor() {
@@ -48,8 +102,7 @@ ShellRoot {
       return "#181b25";
     }
 
-    const battery = UPower.displayDevice;
-    if (battery.state === UPowerDeviceState.Charging || battery.state === UPowerDeviceState.PendingCharge) {
+    if (root.batteryCharging()) {
       return "#263026";
     }
 
