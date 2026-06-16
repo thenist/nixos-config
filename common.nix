@@ -150,6 +150,7 @@ in
      jportaudio
      unrar
       nodejs_24
+      claude-code
       gnumake
       driftwm
       quickshell
