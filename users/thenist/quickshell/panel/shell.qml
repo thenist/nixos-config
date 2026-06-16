@@ -93,7 +93,7 @@ ShellRoot {
 
               width: 24
               height: 24
-              acceptedButtons: Qt.LeftButton | Qt.RightButton
+              acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
               cursorShape: Qt.PointingHandCursor
 
               IconImage {
@@ -102,12 +102,23 @@ ShellRoot {
                 source: trayItem.modelData.icon
               }
 
+              function openMenu() {
+                const pos = trayItem.mapToItem(panel.contentItem, 0, trayItem.height);
+                trayItem.modelData.display(panel, Math.round(pos.x), Math.round(pos.y));
+              }
+
+              onPressed: function(mouse) {
+                if (trayItem.modelData.hasMenu && (mouse.button === Qt.RightButton || trayItem.modelData.onlyMenu)) {
+                  mouse.accepted = true;
+                  trayItem.openMenu();
+                }
+              }
+
               onClicked: function(mouse) {
-                if (mouse.button === Qt.RightButton && trayItem.modelData.hasMenu) {
-                  const pos = trayItem.mapToItem(panel.contentItem, 0, trayItem.height);
-                  trayItem.modelData.display(panel, Math.round(pos.x), Math.round(pos.y));
-                } else {
+                if (mouse.button === Qt.LeftButton && !trayItem.modelData.onlyMenu) {
                   trayItem.modelData.activate();
+                } else if (mouse.button === Qt.MiddleButton) {
+                  trayItem.modelData.secondaryActivate();
                 }
               }
             }
