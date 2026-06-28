@@ -21,6 +21,7 @@
       opencode
       norminette
       ollama
+      bun
     ];
   };
 }
