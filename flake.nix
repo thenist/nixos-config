@@ -12,7 +12,7 @@
     };
 
     driftwm = {
-      url = "github:malbiruk/driftwm/v0.11.0";
+      url = "github:malbiruk/driftwm";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
