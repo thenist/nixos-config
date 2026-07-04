@@ -70,6 +70,14 @@ in
     "XF86MonBrightnessDown" = "spawn brightnessctl set 5%-"
   '';
 
+  # ibus-hangul's event-forwarding workaround consumes Space/Enter and re-sends
+  # them via forward_key_event, which the ibus Wayland IM frontend never
+  # delivers to the client. Disable it so unhandled keys are re-injected
+  # through the compositor's virtual keyboard instead.
+  dconf.settings."org/freedesktop/ibus/engine/hangul" = {
+    use-event-forwarding = false;
+  };
+
   xdg.configFile."quickshell/panel".source = ./quickshell/panel;
   xdg.configFile."quickshell/lock".source = ./quickshell/lock;
 
