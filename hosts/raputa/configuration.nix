@@ -10,4 +10,15 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "raputa"; # Define your hostname.
+
+  # Niri desktop session (registers itself with the greeter and sets up
+  # the gnome/gtk portals).
+  programs.niri.enable = true;
+
+  greeter.sessionName = "niri";
+  greeter.sessionCommand = "/run/current-system/sw/bin/niri-session";
+
+  environment.systemPackages = with pkgs; [
+    swaybg # niri has no built-in wallpaper support
+  ];
 }

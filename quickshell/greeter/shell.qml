@@ -5,7 +5,12 @@ import Quickshell.Services.Greetd
 ShellRoot {
   id: root
 
-  property string status: Greetd.available ? "Sign in to driftwm" : "greetd socket unavailable"
+  // Session name and command are provided by greeter.nix through the
+  // environment of the greeter process.
+  property string sessionName: Quickshell.env("GREETER_SESSION_NAME") || "desktop"
+  property string sessionCmd: Quickshell.env("GREETER_SESSION_CMD") || ""
+
+  property string status: Greetd.available ? "Sign in to " + sessionName : "greetd socket unavailable"
   property bool busy: false
 
   function submit() {
@@ -33,8 +38,8 @@ ShellRoot {
     }
 
     function onReadyToLaunch() {
-      root.status = "Starting driftwm";
-      Greetd.launch(["/run/current-system/sw/bin/driftwm-session"]);
+      root.status = "Starting " + root.sessionName;
+      Greetd.launch([root.sessionCmd]);
     }
 
     function onAuthFailure(message) {
@@ -53,7 +58,7 @@ ShellRoot {
   FloatingWindow {
     id: window
 
-    title: "driftwm greeter"
+    title: root.sessionName + " greeter"
     color: "#0b0d12"
     fullscreen: true
     implicitWidth: screen ? screen.width : 1280
@@ -79,7 +84,7 @@ ShellRoot {
 
           Text {
             width: parent.width
-            text: "driftwm"
+            text: root.sessionName
             color: "#cad3f5"
             font.pixelSize: 34
             font.weight: Font.DemiBold

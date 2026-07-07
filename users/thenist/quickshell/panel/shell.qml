@@ -157,7 +157,7 @@ ShellRoot {
           spacing: 10
 
           ActionPill {
-            label: "driftwm"
+            label: Quickshell.env("XDG_CURRENT_DESKTOP") || "driftwm"
             emphasized: true
             onClicked: root.run("fuzzel")
           }

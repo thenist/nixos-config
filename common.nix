@@ -4,16 +4,9 @@
 
 { config, pkgs, inputs, ... }:
 
-let
-  system = pkgs.stdenv.hostPlatform.system;
-  driftwm = inputs.driftwm.packages.${system}.default;
-  quickshellGreeter = pkgs.writeShellScript "quickshell-greeter" ''
-    export QT_QPA_PLATFORM=wayland
-    export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-    exec ${pkgs.cage}/bin/cage -- ${pkgs.quickshell}/bin/quickshell -p /etc/quickshell/greeter/shell.qml
-  '';
-in
 {
+  imports = [ ./greeter.nix ];
+
   nixpkgs.overlays = [
     (import ./overlays/default.nix)
   ];
@@ -46,18 +39,6 @@ in
     LC_TIME = "ko_KR.UTF-8";
   };
 
-  # driftwm is launched from the Quickshell greeter through greetd.
-  services.greetd = {
-    enable = true;
-    settings.default_session = {
-      command = "${quickshellGreeter}";
-      user = "greeter";
-    };
-  };
-
-  services.displayManager.sessionPackages = [ driftwm ];
-  environment.etc."quickshell/greeter".source = ./quickshell/greeter;
-
   services.dbus.enable = true;
   security.polkit.enable = true;
   security.pam.services.quickshell-lock = {};
@@ -66,7 +47,6 @@ in
   xdg.portal = {
     enable = true;
     wlr.enable = true;
-    configPackages = [ driftwm ];
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
       xdg-desktop-portal-wlr
@@ -152,7 +132,6 @@ in
       nodejs_24
       claude-code
       gnumake
-      driftwm
       quickshell
       cage
       xwayland-satellite

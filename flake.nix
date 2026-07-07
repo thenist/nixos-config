@@ -25,6 +25,7 @@
       specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
+        ./driftwm.nix
         ./hosts/tondemo/configuration.nix
         ./hosts/tondemo/hardware-configuration.nix
         ./users/thenist/user.nix
@@ -45,6 +46,7 @@
       specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
+        ./driftwm.nix
         ./hosts/wonderz/configuration.nix
         ./hosts/wonderz/hardware-configuration.nix
         ./users/thenist/user.nix
