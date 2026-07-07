@@ -59,5 +59,24 @@
         }
       ];
     };
+    nixosConfigurations.raputa = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = { inherit inputs; };
+      modules = [
+        ./common.nix
+        ./hosts/raputa/configuration.nix
+        ./hosts/raputa/hardware-configuration.nix
+        ./users/thenist/user.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.thenist = import ./users/thenist/home.nix;
+            backupFileExtension = "backup";
+          };
+        }
+      ];
+    };
   };
 }
