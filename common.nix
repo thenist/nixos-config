@@ -7,9 +7,6 @@
 {
   imports = [ ./greeter.nix ];
 
-  nixpkgs.overlays = [
-    (import ./overlays/default.nix)
-  ];
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -126,8 +123,6 @@
      ffmpeg
      python315
      gcc
-     portaudio
-     jportaudio
      unrar
       nodejs_24
       claude-code
