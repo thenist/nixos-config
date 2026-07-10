@@ -145,6 +145,8 @@
       adwaita-fonts
       libnotify
       playerctl
+      cargo
+      rustc
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
