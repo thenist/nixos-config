@@ -295,6 +295,7 @@ in
   };
 
   home.pointerCursor = {
+    enable = true;
     name = "WhiteSur-cursors";
     size = 24;
     package = pkgs.whitesur-cursors;
