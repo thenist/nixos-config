@@ -93,11 +93,6 @@
     languagePacks = [ "ko" "en-US" ];
   };
 
-  programs.java = {
-    enable = true;
-    package = (pkgs.jdk17.override { enableJavaFX = true; });
-  };
-
   # Install git.
   programs.git.enable = true;
 
