@@ -2,6 +2,7 @@
 
 import QtQuick
 import Quickshell
+import Quickshell.Services.Pipewire
 import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
 import Quickshell.Widgets
@@ -13,6 +14,20 @@ ShellRoot {
 
   function run(command) {
     Quickshell.execDetached(["sh", "-c", command]);
+  }
+
+  function audioDeviceName(node) {
+    if (!node) {
+      return "unavailable";
+    }
+
+    return node.description || node.nickname || node.name || "unnamed output";
+  }
+
+  ScriptModel {
+    id: audioSinkModel
+
+    values: Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream)
   }
 
   function batteries() {
@@ -230,6 +245,17 @@ ShellRoot {
           }
 
           ActionPill {
+            id: audioButton
+
+            label: "audio: " + root.audioDeviceName(Pipewire.defaultAudioSink)
+            maximumWidth: 190
+            onClicked: {
+              powerMenu.visible = false;
+              audioMenu.visible = !audioMenu.visible;
+            }
+          }
+
+          ActionPill {
             label: "lock"
             onClicked: root.run("quickshell -n -p ~/.config/quickshell/lock/shell.qml")
           }
@@ -238,7 +264,90 @@ ShellRoot {
             id: powerButton
 
             label: "power"
-            onClicked: powerMenu.visible = !powerMenu.visible
+            onClicked: {
+              audioMenu.visible = false;
+              powerMenu.visible = !powerMenu.visible;
+            }
+          }
+        }
+      }
+
+      PopupWindow {
+        id: audioMenu
+
+        color: "transparent"
+        visible: false
+        grabFocus: true
+        implicitWidth: audioMenuContent.implicitWidth
+        implicitHeight: audioMenuContent.implicitHeight
+
+        anchor {
+          window: audioButton.QsWindow.window
+          adjustment: PopupAdjustment.Slide
+          gravity: Edges.Bottom | Edges.Right
+
+          onAnchoring: {
+            const pos = audioButton.QsWindow.contentItem.mapFromItem(
+              audioButton,
+              audioButton.width - audioMenu.width,
+              audioButton.height + 8
+            );
+
+            anchor.rect.x = pos.x;
+            anchor.rect.y = pos.y;
+          }
+        }
+
+        Rectangle {
+          id: audioMenuContent
+
+          implicitWidth: 320
+          implicitHeight: audioMenuColumn.implicitHeight + 14
+          radius: 14
+          color: "#11131af2"
+          border.width: 1
+          border.color: "#2f3344"
+
+          Column {
+            id: audioMenuColumn
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 4
+
+            Text {
+              width: parent.width
+              height: 28
+              leftPadding: 14
+              text: "audio output"
+              color: "#8aadf4"
+              font.pixelSize: 12
+              font.weight: Font.DemiBold
+              verticalAlignment: Text.AlignVCenter
+            }
+
+            Repeater {
+              model: audioSinkModel
+
+              AudioMenuItem {
+                required property var modelData
+
+                audioNode: modelData
+                menu: audioMenu
+              }
+            }
+
+            Text {
+              visible: audioSinkModel.values.length === 0
+              width: parent.width
+              height: visible ? 32 : 0
+              leftPadding: 14
+              text: "no audio outputs available"
+              color: "#6e738d"
+              font.pixelSize: 13
+              verticalAlignment: Text.AlignVCenter
+            }
           }
         }
       }
@@ -336,26 +445,79 @@ ShellRoot {
 
     property string label: ""
     property bool emphasized: false
+    property int maximumWidth: 10000
     signal clicked()
 
-    width: text.implicitWidth + 22
+    width: Math.min(text.implicitWidth + 22, maximumWidth)
     height: 28
     radius: 14
     color: emphasized ? "#8aadf4" : "#181b25"
 
     Text {
       id: text
+
       anchors.centerIn: parent
+      width: parent.width - 22
       text: pill.label
       color: pill.emphasized ? "#11131a" : "#cad3f5"
+      elide: Text.ElideRight
       font.pixelSize: 13
       font.weight: Font.DemiBold
+      horizontalAlignment: Text.AlignHCenter
     }
 
     MouseArea {
       anchors.fill: parent
       cursorShape: Qt.PointingHandCursor
       onClicked: pill.clicked()
+    }
+  }
+
+  component AudioMenuItem: Rectangle {
+    id: item
+
+    required property var audioNode
+    required property var menu
+    property bool active: Pipewire.defaultAudioSink === audioNode
+
+    width: parent ? parent.width : 0
+    height: 34
+    color: active || mouse.containsMouse ? "#242838" : "transparent"
+
+    Rectangle {
+      anchors.left: parent.left
+      anchors.leftMargin: 14
+      anchors.verticalCenter: parent.verticalCenter
+      width: 7
+      height: 7
+      radius: 4
+      color: item.active ? "#8aadf4" : "#3b4055"
+    }
+
+    Text {
+      anchors.left: parent.left
+      anchors.leftMargin: 31
+      anchors.right: parent.right
+      anchors.rightMargin: 14
+      anchors.verticalCenter: parent.verticalCenter
+      text: root.audioDeviceName(item.audioNode)
+      color: item.active ? "#8aadf4" : "#cad3f5"
+      elide: Text.ElideRight
+      font.pixelSize: 13
+      font.weight: item.active ? Font.DemiBold : Font.Medium
+    }
+
+    MouseArea {
+      id: mouse
+
+      anchors.fill: parent
+      hoverEnabled: true
+      cursorShape: Qt.PointingHandCursor
+
+      onClicked: {
+        Pipewire.preferredDefaultAudioSink = item.audioNode;
+        item.menu.visible = false;
+      }
     }
   }
 
