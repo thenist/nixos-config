@@ -13,7 +13,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       prismlauncher
-      freecad
+      #freecad
       kicad
       orca-slicer
       discord
