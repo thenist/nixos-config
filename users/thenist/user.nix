@@ -12,6 +12,7 @@
     description = "thenist";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
+      codex
       prismlauncher
       #freecad
       kicad
