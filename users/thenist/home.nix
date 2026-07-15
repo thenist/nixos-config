@@ -10,6 +10,9 @@ let
     ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd XMODIFIERS
     exec ${ibusPackage}/libexec/ibus-ui-gtk3 --enable-wayland-im --exec-daemon --daemon-args "--xim --panel disable"
   '';
+  # swayidle's -w waits for commands to exit. Detach the timeout lock so sleep
+  # events cannot queue behind it and re-lock the session after authentication.
+  idleLockCommand = "quickshell -n -d -p ~/.config/quickshell/lock/shell.qml";
 in
 {
   home.username = "thenist";
@@ -27,7 +30,7 @@ in
       "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1",
       "nm-applet",
       "mako",
-      "swayidle -w timeout 600 'quickshell -n -p ~/.config/quickshell/lock/shell.qml' before-sleep 'sh -c \"quickshell -n -d -p ~/.config/quickshell/lock/shell.qml; sleep 1\"'"
+      "swayidle -w timeout 600 '${idleLockCommand}' before-sleep 'sh -c \"${idleLockCommand}; sleep 1\"'"
     ]
 
     [env]
@@ -98,7 +101,7 @@ in
     spawn-at-startup "nm-applet"
     spawn-at-startup "mako"
     spawn-at-startup "sh" "-c" "swaybg -i ~/.wallpaper.png -m fill"
-    spawn-at-startup "swayidle" "-w" "timeout" "600" "quickshell -n -p ~/.config/quickshell/lock/shell.qml" "before-sleep" "quickshell -n -d -p ~/.config/quickshell/lock/shell.qml; sleep 1"
+    spawn-at-startup "swayidle" "-w" "timeout" "600" "${idleLockCommand}" "before-sleep" "${idleLockCommand}; sleep 1"
 
     prefer-no-csd
 
