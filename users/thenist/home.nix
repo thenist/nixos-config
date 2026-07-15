@@ -4,12 +4,6 @@ let
   ibusPackage = pkgs.ibus-with-plugins.override {
     plugins = with pkgs.ibus-engines; [ hangul ];
   };
-  ibusStart = pkgs.writeShellScript "ibus-start" ''
-    export XMODIFIERS=@im=ibus
-    ${pkgs.systemd}/bin/systemctl --user unset-environment GTK_IM_MODULE QT_IM_MODULE || true
-    ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd XMODIFIERS
-    exec ${ibusPackage}/libexec/ibus-ui-gtk3 --enable-wayland-im --exec-daemon --daemon-args "--xim --panel disable"
-  '';
   # swayidle's -w waits for commands to exit. Detach the timeout lock so sleep
   # events cannot queue behind it and re-lock the session after authentication.
   idleLockCommand = "quickshell -n -d -p ~/.config/quickshell/lock/shell.qml";
@@ -23,9 +17,35 @@ in
     enable = true;
   };
 
+  # Keep the Wayland frontend and its XIM bridge in one session-bound cgroup.
+  # Each compositor starts this after exporting its Wayland and X11 displays.
+  # The frontend can exit cleanly when Xwayland disappears, so on-failure is
+  # insufficient here: always restart it while the graphical session is alive.
+  systemd.user.services.ibus-wayland = {
+    Unit = {
+      Description = "IBus Wayland input method frontend";
+      ConditionEnvironment = "WAYLAND_DISPLAY";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "simple";
+      Slice = "session.slice";
+      Environment = [ "XMODIFIERS=@im=ibus" ];
+      UnsetEnvironment = [
+        "GTK_IM_MODULE"
+        "QT_IM_MODULE"
+      ];
+      ExecStart = "${ibusPackage}/libexec/ibus-ui-gtk3 --enable-wayland-im --exec-daemon --daemon-args \"--xim --panel disable\"";
+      Restart = "always";
+      RestartSec = "3s";
+      TimeoutStopSec = "5s";
+    };
+  };
+
   xdg.configFile."driftwm/config.toml".text = ''
     autostart = [
-      "${ibusStart}",
+      "${pkgs.systemd}/bin/systemctl --user --no-block restart ibus-wayland.service",
       "quickshell -p ~/.config/quickshell/panel/shell.qml",
       "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1",
       "nm-applet",
@@ -95,7 +115,7 @@ in
         XMODIFIERS "@im=ibus"
     }
 
-    spawn-at-startup "${ibusStart}"
+    spawn-at-startup "${pkgs.systemd}/bin/systemctl" "--user" "--no-block" "restart" "ibus-wayland.service"
     spawn-at-startup "sh" "-c" "quickshell -p ~/.config/quickshell/panel/shell.qml"
     spawn-at-startup "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
     spawn-at-startup "nm-applet"
