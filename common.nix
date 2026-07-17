@@ -7,6 +7,14 @@
 {
   imports = [ ./greeter.nix ];
 
+  nixpkgs.overlays = [
+    (final: prev: {
+      bun = final.callPackage ./packages/bun.nix {
+        bun = prev.bun;
+      };
+    })
+  ];
+
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
