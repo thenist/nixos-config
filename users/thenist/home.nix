@@ -17,6 +17,26 @@ in
     enable = true;
   };
 
+  programs.vim = {
+    enable = true;
+    plugins = [
+      (pkgs.vimUtils.buildVimPlugin {
+        pname = "42header";
+        version = "unstable-2026-05-13";
+        src = pkgs.fetchFromGitHub {
+          owner = "42Paris";
+          repo = "42header";
+          rev = "0b5698ad1c7cc6d43783419d97c8e6cf97088e64";
+          hash = "sha256-xdH/SeGv1bfKMmJ9cHYd5V+ynFohzprnUC8eVer1VcI=";
+        };
+      })
+    ];
+    extraConfig = ''
+      let g:user42 = 'sumpark'
+      let g:mail42 = 'sumpark@student.42gyeongsan.kr'
+    '';
+  };
+
   # Keep the Wayland frontend and its XIM bridge in one session-bound cgroup.
   # Each compositor starts this after exporting its Wayland and X11 displays.
   # The frontend can exit cleanly when Xwayland disappears, so on-failure is
