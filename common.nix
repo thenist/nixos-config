@@ -99,6 +99,13 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # Expose llm-agents.nix packages (e.g. omp) as pkgs.<name>
+  nixpkgs.overlays = [
+    (final: prev: {
+      omp = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.omp;
+    })
+  ];
+
   # Install fonts.
   fonts.packages = with pkgs; [
     nanum
