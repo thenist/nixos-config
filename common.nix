@@ -18,6 +18,12 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # Tailscale VPN.
+  services.tailscale.enable = true;
+
+  # Allow incoming connections on the tailnet interface.
+  networking.firewall.trustedInterfaces = [ "tailscale0" ];
+
   # Set your time zone.
   time.timeZone = "Asia/Seoul";
 
