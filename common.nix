@@ -112,6 +112,14 @@
     })
   ];
 
+  # Numtide binary cache carrying llm-agents.nix prebuilt packages. The
+  # cache config in the llm-agents flake's nixConfig only applies when that
+  # flake is used directly, so declare it here.
+  nix.settings.extra-substituters = [ "https://cache.numtide.com" ];
+  nix.settings.extra-trusted-public-keys = [
+    "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+  ];
+
   # Install fonts.
   fonts.packages = with pkgs; [
     nanum
