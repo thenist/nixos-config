@@ -1,6 +1,6 @@
 # Quickshell greeter launched through greetd. The desktop session it starts
 # after authentication is configured per host via the greeter.* options
-# (driftwm.nix sets them for driftwm hosts; niri hosts set them themselves).
+# (niri.nix sets them for the niri hosts).
 
 { config, pkgs, lib, ... }:
 

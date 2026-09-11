@@ -63,59 +63,9 @@ in
     };
   };
 
-  xdg.configFile."driftwm/config.toml".text = ''
-    autostart = [
-      "${pkgs.systemd}/bin/systemctl --user --no-block restart ibus-wayland.service",
-      "quickshell -p ~/.config/quickshell/panel/shell.qml",
-      "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1",
-      "nm-applet",
-      "mako",
-      "swayidle -w timeout 600 '${idleLockCommand}' before-sleep 'sh -c \"${idleLockCommand}; sleep 1\"'"
-    ]
-
-    [env]
-    XMODIFIERS = "@im=ibus"
-
-    [input.keyboard]
-    layout = "kr"
-    variant = "kr104"
-
-    [cursor]
-    theme = "WhiteSur-cursors"
-    size = 24
-
-    [background]
-    type = "wallpaper"
-    path = "~/.wallpaper.png"
-
-    [decorations]
-    bg_color = "#11131a"
-    fg_color = "#cad3f5"
-    border_width = 1
-    border_color = "#2c2f36"
-    border_color_focused = "#8aadf4"
-    corner_radius = 10
-    font = "Adwaita Sans"
-    font_size = 11
-    font_weight = "medium"
-
-    [keybindings]
-    "mod+return" = "exec foot"
-    "mod+d" = "exec fuzzel"
-    "mod+shift+return" = "exec thunar"
-    "mod+l" = "spawn quickshell -n -p ~/.config/quickshell/lock/shell.qml"
-    "Print" = "spawn grim - | wl-copy"
-    "shift+Print" = 'spawn grim -g "$(slurp -d)" - | wl-copy'
-    "XF86AudioRaiseVolume" = "spawn wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
-    "XF86AudioLowerVolume" = "spawn wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-    "XF86AudioMute" = "spawn wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-    "XF86MonBrightnessUp" = "spawn brightnessctl set +5%"
-    "XF86MonBrightnessDown" = "spawn brightnessctl set 5%-"
-  '';
-
-  # Niri session (used on raputa). Providing a config.kdl replaces niri's
+  # Niri session (used on all hosts). Providing a config.kdl replaces niri's
   # built-in defaults, so all binds are spelled out. Mod+L stays as the lock
-  # key (matching driftwm), so column-right also gets Mod+Semicolon.
+  # key, so column-right also gets Mod+Semicolon.
   xdg.configFile."niri/config.kdl".text = ''
     input {
         keyboard {

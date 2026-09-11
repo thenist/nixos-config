@@ -11,11 +11,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    driftwm = {
-      url = "github:malbiruk/driftwm";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -30,7 +25,7 @@
       specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
-        ./driftwm.nix
+        ./niri.nix
         ./hosts/tondemo/configuration.nix
         ./hosts/tondemo/hardware-configuration.nix
         ./users/thenist/user.nix
@@ -51,7 +46,7 @@
       specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
-        ./driftwm.nix
+        ./niri.nix
         ./hosts/wonderz/configuration.nix
         ./hosts/wonderz/hardware-configuration.nix
         ./users/thenist/user.nix
@@ -71,6 +66,7 @@
       specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
+        ./niri.nix
         ./hosts/raputa/configuration.nix
         ./hosts/raputa/hardware-configuration.nix
         ./users/thenist/user.nix

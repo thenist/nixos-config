@@ -34,26 +34,6 @@
         "type": "github"
       }
     },
-    "driftwm": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1788706356,
-        "narHash": "sha256-Aa/kYfzIV+AjPhKP7u5l8BD6m526Jciihg78TK+1K38=",
-        "owner": "malbiruk",
-        "repo": "driftwm",
-        "rev": "a19a66eabf8e3a851028d6d739761c5471f84fec",
-        "type": "github"
-      },
-      "original": {
-        "owner": "malbiruk",
-        "repo": "driftwm",
-        "type": "github"
-      }
-    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -170,7 +150,6 @@
     },
     "root": {
       "inputs": {
-        "driftwm": "driftwm",
         "home-manager": "home-manager",
         "llm-agents": "llm-agents",
         "nixos-hardware": "nixos-hardware",
