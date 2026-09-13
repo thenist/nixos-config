@@ -19,6 +19,7 @@
       orca-slicer
       discord
       qbittorrent
+      parsec-bin
       opencode
       norminette
       ollama
