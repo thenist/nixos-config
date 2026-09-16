@@ -10,19 +10,13 @@
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, ... }@inputs: {
+  outputs = { nixpkgs, home-manager, nixos-hardware, ... }: {
     # use "nixos", or your hostname as the name of the configuration
     # it's a better practice than "default" shown in the video
     nixosConfigurations.tondemo = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
         ./niri.nix
@@ -43,7 +37,6 @@
     };
     nixosConfigurations.wonderz = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
         ./niri.nix
@@ -63,7 +56,6 @@
     };
     nixosConfigurations.raputa = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit inputs; };
       modules = [
         ./common.nix
         ./niri.nix

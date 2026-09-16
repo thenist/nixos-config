@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [ ./greeter.nix ];
@@ -108,21 +108,6 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-
-  # Expose llm-agents.nix packages (e.g. omp) as pkgs.<name>
-  nixpkgs.overlays = [
-    (final: prev: {
-      omp = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.omp;
-    })
-  ];
-
-  # Numtide binary cache carrying llm-agents.nix prebuilt packages. The
-  # cache config in the llm-agents flake's nixConfig only applies when that
-  # flake is used directly, so declare it here.
-  nix.settings.extra-substituters = [ "https://cache.numtide.com" ];
-  nix.settings.extra-trusted-public-keys = [
-    "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-  ];
 
   # Install fonts.
   fonts.packages = with pkgs; [
