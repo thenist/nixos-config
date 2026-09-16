@@ -5,7 +5,10 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ./greeter.nix ];
+  imports = [
+    ./greeter.nix
+    ./zapret2.nix
+  ];
 
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
