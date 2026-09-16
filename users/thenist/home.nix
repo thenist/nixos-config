@@ -276,6 +276,12 @@ in
   gtk = {
     enable = true;
 
+    # Sets gtk-application-prefer-dark-theme in the GTK 3/4 settings.ini and
+    # org.gnome.desktop.interface color-scheme in dconf. Everything that reads
+    # the XDG settings portal gets this too (libadwaita, Qt, Chromium/Electron),
+    # which is why apps that ignore gtk-theme-name still render dark.
+    colorScheme = "dark";
+
     theme = {
       name = "WhiteSur-Dark";
       package = pkgs.whitesur-gtk-theme;
@@ -285,6 +291,15 @@ in
       name = "WhiteSur-dark";
       package = pkgs.whitesur-icon-theme;
     };
+  };
+
+  # Qt apps ignore the settings portal unless a platform theme is selected;
+  # the GTK3 platform theme makes them take the palette/fonts from WhiteSur-Dark
+  # and follow the color scheme. Sets QT_QPA_PLATFORMTHEME for the session
+  # (systemd user environment) and for login shells.
+  qt = {
+    enable = true;
+    platformTheme.name = "gtk3";
   };
 
   home.pointerCursor = {

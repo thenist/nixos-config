@@ -93,7 +93,8 @@
     ];
   };
 
-  # Install firefox.
+  # Install firefox. Its light/dark theme follows the system color scheme,
+  # which users/thenist/home.nix sets to dark via gtk.colorScheme.
   programs.firefox = {
     enable = true;
     languagePacks = [ "ko" "en-US" ];
