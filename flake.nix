@@ -10,9 +10,23 @@
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # KiCAD MCP server. Upstream flake builds the Rust binary against a
+    # pinned toolchain and tracks its own nixpkgs, which we override so the
+    # whole system shares one nixpkgs revision.
+    konnect = {
+      url = "github:mixelpixx/Konnect";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, nixos-hardware, ... }: {
+  outputs = { nixpkgs, home-manager, nixos-hardware, konnect, ... }: let
+    konnectOverlay = _final: prev: {
+      konnect = konnect.packages.${prev.stdenv.hostPlatform.system}.konnect;
+    };
+  in {
+    packages.x86_64-linux.konnect = konnect.packages.x86_64-linux.konnect;
+
     # use "nixos", or your hostname as the name of the configuration
     # it's a better practice than "default" shown in the video
     nixosConfigurations.tondemo = nixpkgs.lib.nixosSystem {
@@ -26,6 +40,7 @@
         nixos-hardware.nixosModules.lenovo-thinkpad-t480
         home-manager.nixosModules.home-manager
         {
+          nixpkgs.overlays = [ konnectOverlay ];
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
@@ -45,6 +60,7 @@
         ./users/thenist/user.nix
         home-manager.nixosModules.home-manager
         {
+          nixpkgs.overlays = [ konnectOverlay ];
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
@@ -64,6 +80,7 @@
         ./users/thenist/user.nix
         home-manager.nixosModules.home-manager
         {
+          nixpkgs.overlays = [ konnectOverlay ];
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;

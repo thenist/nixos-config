@@ -16,6 +16,7 @@
       prismlauncher
 #     freecad
       kicad
+      konnect # KiCAD MCP server (flaked in from github:mixelpixx/Konnect)
       orca-slicer
       discord
       qbittorrent
