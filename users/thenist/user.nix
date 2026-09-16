@@ -14,7 +14,7 @@
     packages = with pkgs; [
       codex
       prismlauncher
-      freecad
+#     freecad
       kicad
       orca-slicer
       discord
