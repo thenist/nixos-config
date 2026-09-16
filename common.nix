@@ -61,6 +61,9 @@
   services.tumbler.enable = true;
   services.upower.enable = true;
 
+  # Compressed RAM swap (zstd, capped at 50% of RAM). No host has disk swap.
+  zramSwap.enable = true;
+
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
