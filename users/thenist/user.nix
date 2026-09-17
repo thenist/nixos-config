@@ -14,7 +14,7 @@
     packages = with pkgs; [
       codex
       prismlauncher
-#     freecad
+      freecad
       kicad
       konnect # KiCAD MCP server (flaked in from github:mixelpixx/Konnect)
       orca-slicer
