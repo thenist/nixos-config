@@ -26,6 +26,7 @@
       ollama
       bun
       omp
+      (callPackage ../../pkgs/deepseek-harness { })
     ];
   };
 }

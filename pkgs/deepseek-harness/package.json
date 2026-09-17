@@ -1,0 +1,8 @@
+{
+  "name": "dsh-npm-deps",
+  "private": true,
+  "description": "Dependency root for the Nix build of @deepseek-ai/dsh; not published.",
+  "dependencies": {
+    "@deepseek-ai/dsh": "0.1.5-rc.1"
+  }
+}
