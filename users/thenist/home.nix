@@ -310,5 +310,22 @@ in
     gtk.enable = true;
   };
 
+  # KiCad through Konnect, for every dsh profile: the harness layers this
+  # home-level patch file after each profile's own cordis.patch.yml and reads
+  # it without any launcher flag, so one row covers web/headless/tui alike (a
+  # `--patch` flag cannot: `dsh web` rejects parent options). `command` pins
+  # the konnect this config installs rather than whatever PATH resolves. The
+  # server speaks MCP over stdio and auto-detects kicad-cli, so KiCad 10 only
+  # needs Preferences → Plugins → "Enable KiCad API" for its PCB tools.
+  home.file.".dsh/cordis.patch.yml".text = ''
+    - insert:
+        - id: mcp-konnect
+          name: '@deepseek-ai/dsh-mcp-client'
+          config:
+            serverName: konnect
+            transport: stdio
+            command: ${pkgs.lib.getExe' pkgs.konnect "konnect"}
+  '';
+
   home.file.".wallpaper.png".source = ./wallpaper.png;
 }
