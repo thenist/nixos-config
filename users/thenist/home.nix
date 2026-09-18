@@ -37,6 +37,26 @@ in
     '';
   };
 
+  # oh-my-zsh + powerlevel10k. oh-my-zsh resolves custom themes from
+  # $ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme, and the nixpkgs powerlevel10k
+  # package ships exactly share/zsh/themes/powerlevel10k/powerlevel10k.zsh-theme,
+  # so its share/zsh doubles as ZSH_CUSTOM. Until the first interactive shell
+  # runs the p10k wizard and writes ~/.p10k.zsh, p10k uses its built-in
+  # defaults. Completion/compinit is left to oh-my-zsh (common.nix disables
+  # the global /etc/zshrc compinit so it does not run twice per shell).
+  programs.zsh = {
+    enable = true;
+
+    oh-my-zsh = {
+      enable = true;
+      theme = "powerlevel10k/powerlevel10k";
+      custom = "${pkgs.zsh-powerlevel10k}/share/zsh";
+    };
+
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+  };
+
   # Keep the Wayland frontend and its XIM bridge in one session-bound cgroup.
   # Each compositor starts this after exporting its Wayland and X11 displays.
   # The frontend can exit cleanly when Xwayland disappears, so on-failure is

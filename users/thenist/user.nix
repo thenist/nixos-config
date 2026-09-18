@@ -10,6 +10,7 @@
   users.users.thenist = {
     isNormalUser = true;
     description = "thenist";
+    shell = pkgs.zsh;
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       codex
