@@ -8,6 +8,7 @@ import Quickshell.Services.Pipewire
 import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
 import Quickshell.Widgets
+import "i18n"
 
 ShellRoot {
   id: root
@@ -25,7 +26,7 @@ ShellRoot {
 
   DesktopState {
     id: systemState
-    onBrightnessAdjusted: value => root.showFeedback("Brightness  " + Math.round(value) + "%", value / 100)
+    onBrightnessAdjusted: value => root.showFeedback(Tr.tr("Brightness  %1%").arg(Math.round(value)), value / 100)
   }
 
   IpcHandler {
@@ -37,6 +38,7 @@ ShellRoot {
   property string feedbackLabel: ""
   property real feedbackLevel: 0
   property string feedbackOutput: ""
+  property bool feedbackVisible: false
   property bool audioInitialized: false
 
   function showFeedback(label, level) {
@@ -44,13 +46,14 @@ ShellRoot {
     feedbackLevel = level;
     const focused = niri.workspaces.find(w => w.is_focused);
     feedbackOutput = focused ? focused.output : (Quickshell.screens.length ? Quickshell.screens[0].name : "");
+    feedbackVisible = true;
     feedbackTimer.restart();
   }
 
   function audioChanged() {
     if (!audioInitialized || !sinkAudio)
       return;
-    showFeedback(sinkAudio.muted ? "Sound muted" : "Volume  " + Math.round(sinkAudio.volume * 100) + "%", sinkAudio.muted ? 0 : sinkAudio.volume);
+    showFeedback(sinkAudio.muted ? Tr.tr("Sound muted") : Tr.tr("Volume  %1%").arg(Math.round(sinkAudio.volume * 100)), sinkAudio.muted ? 0 : sinkAudio.volume);
   }
 
   onSinkAudioChanged: {
@@ -66,6 +69,7 @@ ShellRoot {
   Timer {
     id: feedbackTimer
     interval: 1600
+    onTriggered: root.feedbackVisible = false
   }
   Connections {
     target: root.sinkAudio
@@ -93,10 +97,10 @@ ShellRoot {
 
   function audioDeviceName(node) {
     if (!node) {
-      return "unavailable";
+      return Tr.tr("unavailable");
     }
 
-    return node.description || node.nickname || node.name || "unnamed output";
+    return node.description || node.nickname || node.name || Tr.tr("unnamed output");
   }
 
   ScriptModel {
@@ -181,14 +185,14 @@ ShellRoot {
     }
 
     if (root.batteryCharging()) {
-      return "chg " + root.batteryPercent() + "%";
+      return Tr.tr("chg %1%").arg(root.batteryPercent());
     }
 
     if (root.batteryFull()) {
-      return "full";
+      return Tr.tr("full");
     }
 
-    return "bat " + root.batteryPercent() + "%";
+    return Tr.tr("bat %1%").arg(root.batteryPercent());
   }
 
   function batteryColor() {
@@ -250,7 +254,7 @@ ShellRoot {
           ActionPill {
             label: "󱄅"
             iconFont: true
-            tooltip: "Applications · Mod+D"
+            tooltip: Tr.tr("Applications · Mod+D")
             onClicked: root.run("fuzzel")
           }
 
@@ -294,7 +298,7 @@ ShellRoot {
                   emphasized: modelData.is_active
                   urgent: modelData.is_urgent || false
                   dimmed: !modelData.is_active && modelData.active_window_id === null
-                  tooltip: modelData.name || "Workspace " + modelData.idx
+                  tooltip: modelData.name || Tr.tr("Workspace %1").arg(modelData.idx)
                   onClicked: niri.focus(modelData.id)
                   onScrolled: delta => niri.step(panel.screen.name, delta > 0 ? -1 : 1)
                 }
@@ -310,7 +314,7 @@ ShellRoot {
           readonly property real freeRight: rightRow.x - 12
           x: Math.max(freeLeft, Math.min((parent.width - width) / 2, freeRight - width))
           visible: freeRight - freeLeft >= implicitWidth
-          text: Qt.formatDateTime(root.now, panel.width < 850 ? "HH:mm" : "ddd d MMM  HH:mm")
+          text: Qt.locale().toString(root.now, Tr.tr(panel.width < 850 ? "HH:mm" : "ddd d MMM  HH:mm"))
           color: "#cad3f5"
           font.family: "Adwaita Sans"
           font.pixelSize: 13
@@ -347,7 +351,7 @@ ShellRoot {
                   hoverEnabled: true
                   ToolTip.visible: containsMouse
                   ToolTip.delay: 600
-                  ToolTip.text: modelData.tooltipTitle || modelData.title || "Tray item"
+                  ToolTip.text: modelData.tooltipTitle || modelData.title || Tr.tr("Tray item")
 
                   Rectangle {
                     anchors.fill: parent
@@ -394,8 +398,8 @@ ShellRoot {
           ActionPill {
             id: audioButton
 
-            label: !root.sinkAudio ? "󰖁 —" : root.sinkAudio.muted ? "󰖁 muted" : "󰕾 " + Math.round(root.sinkAudio.volume * 100) + "%"
-            tooltip: root.audioDeviceName(root.sink) + "\nScroll: volume · Middle-click: mute"
+            label: !root.sinkAudio ? "󰖁 —" : root.sinkAudio.muted ? "󰖁 " + Tr.tr("muted") : "󰕾 " + Math.round(root.sinkAudio.volume * 100) + "%"
+            tooltip: root.audioDeviceName(root.sink) + "\n" + Tr.tr("Scroll: volume · Middle-click: mute")
             onMiddleClicked: root.toggleMute()
             onScrolled: delta => {
               if (root.sinkAudio)
@@ -408,7 +412,7 @@ ShellRoot {
             id: controlsButton
             label: "󰒓"
             iconFont: true
-            tooltip: "Controls · sound, brightness, network and session"
+            tooltip: Tr.tr("Controls · sound, brightness, network and session")
             emphasized: controls.visible
             onClicked: controls.visible = !controls.visible
           }
@@ -435,7 +439,7 @@ ShellRoot {
 
       Feedback {
         screen: panel.screen
-        visible: feedbackTimer.running && root.feedbackOutput === panel.screen.name && !controls.visible
+        shown: root.feedbackVisible && root.feedbackOutput === panel.screen.name && !controls.visible
         label: root.feedbackLabel
         level: root.feedbackLevel
       }

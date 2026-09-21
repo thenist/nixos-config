@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Pipewire
+import "i18n"
 
 PopupWindow {
   id: popup
@@ -56,19 +57,19 @@ PopupWindow {
         RowLayout {
           Layout.fillWidth: true
           Label {
-            text: "Controls"
+            text: Tr.tr("Controls")
             font.pixelSize: 17
             font.bold: true
             Layout.fillWidth: true
           }
           ControlButton {
-            text: "Close"
+            text: Tr.tr("Close")
             onClicked: popup.visible = false
           }
         }
 
         Label {
-          text: "Sound"
+          text: Tr.tr("Sound")
           color: "#8aadf4"
         }
         Label {
@@ -79,7 +80,7 @@ PopupWindow {
         RowLayout {
           Layout.fillWidth: true
           ControlButton {
-            text: popup.audio && popup.audio.muted ? "Unmute" : "Mute"
+            text: popup.audio && popup.audio.muted ? Tr.tr("Unmute") : Tr.tr("Mute")
             enabled: !!popup.audio
             onClicked: popup.muteRequested()
           }
@@ -111,7 +112,7 @@ PopupWindow {
 
         Label {
           visible: popup.desktop.brightness >= 0
-          text: "Brightness"
+          text: Tr.tr("Brightness")
           color: "#8aadf4"
         }
         RowLayout {
@@ -138,7 +139,7 @@ PopupWindow {
         }
 
         Label {
-          text: "Network"
+          text: Tr.tr("Network")
           color: "#8aadf4"
         }
         Label {
@@ -147,7 +148,7 @@ PopupWindow {
           wrapMode: Text.Wrap
         }
         ControlButton {
-          text: "Network settings ↗"
+          text: Tr.tr("Network settings ↗")
           Layout.fillWidth: true
           onClicked: popup.run("nm-connection-editor")
         }
@@ -160,12 +161,12 @@ PopupWindow {
         RowLayout {
           Layout.fillWidth: true
           ControlButton {
-            text: "Lock"
+            text: Tr.tr("Lock")
             Layout.fillWidth: true
             onClicked: popup.run("quickshell -n -p ~/.config/quickshell/lock/shell.qml")
           }
           ControlButton {
-            text: "Suspend"
+            text: Tr.tr("Suspend")
             Layout.fillWidth: true
             onClicked: popup.run("systemctl suspend")
           }
@@ -173,12 +174,12 @@ PopupWindow {
         RowLayout {
           Layout.fillWidth: true
           ControlButton {
-            text: "Restart"
+            text: Tr.tr("Restart")
             Layout.fillWidth: true
             onClicked: popup.pendingPower = "reboot"
           }
           ControlButton {
-            text: "Shut down"
+            text: Tr.tr("Shut down")
             Layout.fillWidth: true
             onClicked: popup.pendingPower = "poweroff"
           }
@@ -187,13 +188,13 @@ PopupWindow {
           visible: popup.pendingPower.length > 0
           Layout.fillWidth: true
           ControlButton {
-            text: popup.pendingPower === "reboot" ? "Confirm restart" : "Confirm shutdown"
+            text: popup.pendingPower === "reboot" ? Tr.tr("Confirm restart") : Tr.tr("Confirm shutdown")
             Layout.fillWidth: true
             destructive: true
             onClicked: popup.run("systemctl " + popup.pendingPower)
           }
           ControlButton {
-            text: "Cancel"
+            text: Tr.tr("Cancel")
             onClicked: popup.pendingPower = ""
           }
         }

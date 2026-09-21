@@ -1,11 +1,12 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "i18n"
 
 Scope {
   id: root
   property real brightness: -1
-  property string network: "Checking network…"
+  property string network: Tr.tr("Checking network…")
   property string error: ""
   property int pendingBrightness: -1
   signal brightnessAdjusted(real value)
@@ -62,7 +63,7 @@ Scope {
   Process {
     id: brightnessWrite
     onExited: (code, status) => {
-      root.error = code === 0 ? "" : "Could not change brightness";
+      root.error = code === 0 ? "" : Tr.tr("Could not change brightness");
       root.refreshBrightness();
     }
   }
@@ -77,20 +78,20 @@ Scope {
       onStreamFinished: {
         const fields = text.trim().split(":");
         if (fields[1] === "full")
-          root.network = "Connected · Internet available";
+          root.network = Tr.tr("Connected · Internet available");
         else if (fields[1] === "portal")
-          root.network = "Sign-in required";
+          root.network = Tr.tr("Sign-in required");
         else if (fields[0].startsWith("connected"))
-          root.network = "Connected · Limited connectivity";
+          root.network = Tr.tr("Connected · Limited connectivity");
         else if (fields[0] === "connecting")
-          root.network = "Connecting…";
+          root.network = Tr.tr("Connecting…");
         else
-          root.network = "Disconnected";
+          root.network = Tr.tr("Disconnected");
       }
     }
     onExited: (code, status) => {
       if (code !== 0)
-        root.network = "Network status unavailable";
+        root.network = Tr.tr("Network status unavailable");
     }
   }
 
