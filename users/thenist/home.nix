@@ -167,8 +167,8 @@ in
         XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
         XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
         XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
-        XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "set" "+5%"; }
-        XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "5%-"; }
+        XF86MonBrightnessUp allow-when-locked=true { spawn "sh" "-c" "brightnessctl --class=backlight --min-value=1 set +5% && quickshell ipc -p ~/.config/quickshell/panel/shell.qml call desktop refreshBrightness"; }
+        XF86MonBrightnessDown allow-when-locked=true { spawn "sh" "-c" "brightnessctl --class=backlight --min-value=1 set 5%- && quickshell ipc -p ~/.config/quickshell/panel/shell.qml call desktop refreshBrightness"; }
 
         Mod+Q { close-window; }
 

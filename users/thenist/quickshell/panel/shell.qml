@@ -3,6 +3,7 @@
 import QtQuick
 import QtQuick.Controls
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
@@ -20,6 +21,60 @@ ShellRoot {
   }
   PwObjectTracker {
     objects: root.sink ? [root.sink] : []
+  }
+
+  DesktopState {
+    id: systemState
+    onBrightnessAdjusted: value => root.showFeedback("Brightness  " + Math.round(value) + "%", value / 100)
+  }
+
+  IpcHandler {
+    target: "desktop"
+    function refreshBrightness(): void {
+      systemState.refreshBrightness();
+    }
+  }
+  property string feedbackLabel: ""
+  property real feedbackLevel: 0
+  property string feedbackOutput: ""
+  property bool audioInitialized: false
+
+  function showFeedback(label, level) {
+    feedbackLabel = label;
+    feedbackLevel = level;
+    const focused = niri.workspaces.find(w => w.is_focused);
+    feedbackOutput = focused ? focused.output : (Quickshell.screens.length ? Quickshell.screens[0].name : "");
+    feedbackTimer.restart();
+  }
+
+  function audioChanged() {
+    if (!audioInitialized || !sinkAudio)
+      return;
+    showFeedback(sinkAudio.muted ? "Sound muted" : "Volume  " + Math.round(sinkAudio.volume * 100) + "%", sinkAudio.muted ? 0 : sinkAudio.volume);
+  }
+
+  onSinkAudioChanged: {
+    audioInitialized = false;
+    audioWarmup.restart();
+  }
+  Timer {
+    id: audioWarmup
+    interval: 300
+    running: true
+    onTriggered: root.audioInitialized = !!root.sinkAudio
+  }
+  Timer {
+    id: feedbackTimer
+    interval: 1600
+  }
+  Connections {
+    target: root.sinkAudio
+    function onVolumeChanged() {
+      root.audioChanged();
+    }
+    function onMutedChanged() {
+      root.audioChanged();
+    }
   }
 
   function setVolume(value) {
@@ -346,220 +401,43 @@ ShellRoot {
               if (root.sinkAudio)
                 root.setVolume(root.sinkAudio.volume + (delta > 0 ? 0.05 : -0.05));
             }
-            onClicked: {
-              powerMenu.visible = false;
-              audioMenu.visible = !audioMenu.visible;
-            }
+            onClicked: controls.visible = !controls.visible
           }
 
           ActionPill {
-            visible: panel.width >= 700
-            label: "󰌾"
+            id: controlsButton
+            label: "󰒓"
             iconFont: true
-            tooltip: "Lock · Mod+L"
-            onClicked: root.run("quickshell -n -p ~/.config/quickshell/lock/shell.qml")
-          }
-
-          ActionPill {
-            id: powerButton
-
-            label: "󰐥"
-            iconFont: true
-            tooltip: "Session and power"
-            onClicked: {
-              audioMenu.visible = false;
-              powerMenu.visible = !powerMenu.visible;
-            }
+            tooltip: "Controls · sound, brightness, network and session"
+            emphasized: controls.visible
+            onClicked: controls.visible = !controls.visible
           }
         }
       }
 
-      PopupWindow {
-        id: audioMenu
-
-        color: "transparent"
-        visible: false
-        grabFocus: true
-        implicitWidth: audioMenuContent.implicitWidth
-        implicitHeight: audioMenuContent.implicitHeight
-
+      ControlCenter {
+        id: controls
+        desktop: systemState
+        audio: root.sinkAudio
+        outputs: audioSinkModel
+        outputName: root.audioDeviceName(root.sink)
+        onVolumeRequested: value => root.setVolume(value)
+        onMuteRequested: root.toggleMute()
+        onCommandRequested: command => root.run(command)
         anchor {
-          window: audioButton.QsWindow.window
+          window: panel
           adjustment: PopupAdjustment.Slide
           gravity: Edges.Bottom | Edges.Right
-
-          onAnchoring: {
-            const pos = audioButton.QsWindow.contentItem.mapFromItem(audioButton, audioButton.width - audioMenu.width, audioButton.height + 8);
-
-            anchor.rect.x = pos.x;
-            anchor.rect.y = pos.y;
-          }
-        }
-
-        Rectangle {
-          id: audioMenuContent
-
-          implicitWidth: 320
-          implicitHeight: audioMenuColumn.implicitHeight + 14
-          radius: 14
-          color: "#11131af2"
-          border.width: 1
-          border.color: "#2f3344"
-
-          Column {
-            id: audioMenuColumn
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 4
-
-            Text {
-              width: parent.width - 28
-              x: 14
-              text: root.audioDeviceName(root.sink)
-              elide: Text.ElideRight
-              color: "#cad3f5"
-              font.family: "Adwaita Sans"
-              font.pixelSize: 13
-              height: 30
-              verticalAlignment: Text.AlignVCenter
-            }
-
-            Row {
-              x: 14
-              spacing: 10
-              ActionPill {
-                label: root.sinkAudio && root.sinkAudio.muted ? "Unmute" : "Mute"
-                tooltip: "Toggle output mute"
-                onClicked: root.toggleMute()
-              }
-              Slider {
-                width: 150
-                height: 28
-                from: 0
-                to: 1
-                stepSize: 0.01
-                enabled: !!root.sinkAudio
-                value: root.sinkAudio ? root.sinkAudio.volume : 0
-                onMoved: root.setVolume(value)
-                palette.highlight: "#8aadf4"
-                palette.button: "#cad3f5"
-              }
-              Text {
-                text: root.sinkAudio ? Math.round(root.sinkAudio.volume * 100) + "%" : "—"
-                color: "#cad3f5"
-                font.family: "Adwaita Sans"
-                font.pixelSize: 12
-                height: 28
-                verticalAlignment: Text.AlignVCenter
-              }
-            }
-
-            Text {
-              width: parent.width
-              height: 28
-              leftPadding: 14
-              text: "audio output"
-              color: "#8aadf4"
-              font.family: "Adwaita Sans"
-              font.pixelSize: 12
-              font.weight: Font.DemiBold
-              verticalAlignment: Text.AlignVCenter
-            }
-
-            Repeater {
-              model: audioSinkModel
-
-              AudioMenuItem {
-                required property var modelData
-
-                audioNode: modelData
-                menu: audioMenu
-              }
-            }
-
-            Text {
-              visible: audioSinkModel.values.length === 0
-              width: parent.width
-              height: visible ? 32 : 0
-              leftPadding: 14
-              text: "no audio outputs available"
-              color: "#6e738d"
-              font.family: "Adwaita Sans"
-              font.pixelSize: 13
-              verticalAlignment: Text.AlignVCenter
-            }
-          }
+          rect.x: panel.width - controls.width - 8
+          rect.y: panel.height + 8
         }
       }
 
-      PopupWindow {
-        id: powerMenu
-
-        color: "transparent"
-        visible: false
-        grabFocus: true
-        implicitWidth: powerMenuContent.implicitWidth
-        implicitHeight: powerMenuContent.implicitHeight
-
-        anchor {
-          window: powerButton.QsWindow.window
-          adjustment: PopupAdjustment.Slide
-          gravity: Edges.Bottom | Edges.Right
-
-          onAnchoring: {
-            const pos = powerButton.QsWindow.contentItem.mapFromItem(powerButton, powerButton.width - powerMenu.width, powerButton.height + 8);
-
-            anchor.rect.x = pos.x;
-            anchor.rect.y = pos.y;
-          }
-        }
-
-        Rectangle {
-          id: powerMenuContent
-
-          implicitWidth: 132
-          implicitHeight: powerMenuColumn.implicitHeight + 14
-          radius: 14
-          color: "#11131af2"
-          border.width: 1
-          border.color: "#2f3344"
-
-          Column {
-            id: powerMenuColumn
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 4
-
-            PowerMenuItem {
-              label: "lock"
-              command: "quickshell -n -p ~/.config/quickshell/lock/shell.qml"
-              menu: powerMenu
-            }
-
-            PowerMenuItem {
-              label: "suspend"
-              command: "systemctl suspend"
-              menu: powerMenu
-            }
-
-            PowerMenuItem {
-              label: "reboot"
-              command: "systemctl reboot"
-              menu: powerMenu
-            }
-
-            PowerMenuItem {
-              label: "shutdown"
-              command: "systemctl poweroff"
-              menu: powerMenu
-              destructive: true
-            }
-          }
-        }
+      Feedback {
+        screen: panel.screen
+        visible: feedbackTimer.running && root.feedbackOutput === panel.screen.name && !controls.visible
+        label: root.feedbackLabel
+        level: root.feedbackLevel
       }
     }
   }
@@ -638,92 +516,6 @@ ShellRoot {
       onWheel: event => {
         if (event.angleDelta.y !== 0)
           pill.scrolled(event.angleDelta.y);
-      }
-    }
-  }
-
-  component AudioMenuItem: Rectangle {
-    id: item
-
-    required property var audioNode
-    required property var menu
-    property bool active: Pipewire.defaultAudioSink === audioNode
-
-    width: parent ? parent.width : 0
-    height: 34
-    color: active || mouse.containsMouse ? "#242838" : "transparent"
-
-    Rectangle {
-      anchors.left: parent.left
-      anchors.leftMargin: 14
-      anchors.verticalCenter: parent.verticalCenter
-      width: 7
-      height: 7
-      radius: 4
-      color: item.active ? "#8aadf4" : "#3b4055"
-    }
-
-    Text {
-      anchors.left: parent.left
-      anchors.leftMargin: 31
-      anchors.right: parent.right
-      anchors.rightMargin: 14
-      anchors.verticalCenter: parent.verticalCenter
-      text: root.audioDeviceName(item.audioNode)
-      font.family: "Adwaita Sans"
-      color: item.active ? "#8aadf4" : "#cad3f5"
-      elide: Text.ElideRight
-      font.pixelSize: 13
-      font.weight: item.active ? Font.DemiBold : Font.Medium
-    }
-
-    MouseArea {
-      id: mouse
-
-      anchors.fill: parent
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-
-      onClicked: {
-        Pipewire.preferredDefaultAudioSink = item.audioNode;
-        item.menu.visible = false;
-      }
-    }
-  }
-
-  component PowerMenuItem: Rectangle {
-    id: item
-
-    required property string label
-    required property string command
-    required property var menu
-    property bool destructive: false
-
-    width: parent ? parent.width : 0
-    height: 30
-    color: mouse.containsMouse ? "#242838" : "transparent"
-
-    Text {
-      anchors.left: parent.left
-      anchors.leftMargin: 14
-      anchors.verticalCenter: parent.verticalCenter
-      text: item.label
-      font.family: "Adwaita Sans"
-      color: item.destructive ? "#ed8796" : "#cad3f5"
-      font.pixelSize: 13
-      font.weight: Font.DemiBold
-    }
-
-    MouseArea {
-      id: mouse
-
-      anchors.fill: parent
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-
-      onClicked: {
-        item.menu.visible = false;
-        root.run(item.command);
       }
     }
   }
