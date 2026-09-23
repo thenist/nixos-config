@@ -6,11 +6,19 @@
 
 let
   cfg = config.greeter;
+  greeterConfig = import ./quickshell/with-i18n.nix {
+    inherit pkgs;
+    dir = ./quickshell/greeter;
+  };
   quickshellGreeter = pkgs.writeShellScript "quickshell-greeter" ''
     export QT_QPA_PLATFORM=wayland
     export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
     export GREETER_SESSION_NAME=${lib.escapeShellArg cfg.sessionName}
     export GREETER_SESSION_CMD=${lib.escapeShellArg cfg.sessionCommand}
+    # The greeter runs outside any user session, so it has no locale to inherit;
+    # the i18n singleton reads LANG to pick the login screen's language.
+    ${lib.optionalString (config.i18n.defaultLocale != null)
+      "export LANG=${lib.escapeShellArg config.i18n.defaultLocale}"}
     exec ${pkgs.cage}/bin/cage -- ${pkgs.quickshell}/bin/quickshell -p /etc/quickshell/greeter/shell.qml
   '';
 in
@@ -36,6 +44,6 @@ in
       };
     };
 
-    environment.etc."quickshell/greeter".source = ./quickshell/greeter;
+    environment.etc."quickshell/greeter".source = greeterConfig;
   };
 }

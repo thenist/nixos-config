@@ -2,11 +2,12 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Pam
 import Quickshell.Wayland
+import "i18n"
 
 ShellRoot {
   id: root
 
-  property string status: "Session locked"
+  property string status: Tr.tr("Session locked")
   property string pendingPassword: ""
   property bool authenticating: false
   signal clearPassword()
@@ -16,7 +17,7 @@ ShellRoot {
 
     pendingPassword = password;
     authenticating = true;
-    status = "Checking password";
+    status = Tr.tr("Checking password");
     pam.start();
   }
 
@@ -41,7 +42,7 @@ ShellRoot {
       }
 
       root.pendingPassword = "";
-      root.status = result === PamResult.MaxTries ? "Too many attempts" : "Authentication failed";
+      root.status = result === PamResult.MaxTries ? Tr.tr("Too many attempts") : Tr.tr("Authentication failed");
       root.clearPassword();
     }
 
@@ -106,7 +107,7 @@ ShellRoot {
 
               Text {
                 anchors.centerIn: parent
-                text: "Password"
+                text: Tr.tr("Password")
                 color: "#6e738d"
                 font.pixelSize: 14
                 visible: passwordInput.text.length === 0 && !passwordInput.activeFocus
@@ -143,7 +144,7 @@ ShellRoot {
 
             Text {
               width: parent.width
-              text: "Press Enter to unlock"
+              text: Tr.tr("Press Enter to unlock")
               color: "#6e738d"
               font.pixelSize: 13
               horizontalAlignment: Text.AlignHCenter

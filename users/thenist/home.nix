@@ -7,6 +7,12 @@ let
   # swayidle's -w waits for commands to exit. Detach the timeout lock so sleep
   # events cannot queue behind it and re-lock the session after authentication.
   idleLockCommand = "quickshell -n -d -p ~/.config/quickshell/lock/shell.qml";
+  # Quickshell resolves imports against the shell's own directory, so each
+  # config gets the shared i18n singleton merged in (quickshell/with-i18n.nix).
+  quickshellConfig = name: import ../../quickshell/with-i18n.nix {
+    inherit pkgs;
+    dir = ./quickshell/${name};
+  };
 in
 {
   home.username = "thenist";
@@ -259,8 +265,8 @@ in
     use-event-forwarding = false;
   };
 
-  xdg.configFile."quickshell/panel".source = ./quickshell/panel;
-  xdg.configFile."quickshell/lock".source = ./quickshell/lock;
+  xdg.configFile."quickshell/panel".source = quickshellConfig "panel";
+  xdg.configFile."quickshell/lock".source = quickshellConfig "lock";
 
   xdg.configFile."autostart/ibus-daemon.desktop".text = ''
     [Desktop Entry]

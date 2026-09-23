@@ -3,9 +3,10 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-// Panel/bar translations. Keys are the English source strings used in the QML;
-// a missing key (or an unknown language) falls back to the English source, so
-// new strings never break the panel.
+// Desktop shell translations (panel, lock screen, greeter). Keys are the
+// English source strings used in the QML; a missing key (or an unknown
+// language) falls back to the English source, so new strings never break the
+// shell.
 //
 // The language is taken from the session locale with POSIX precedence
 // (LC_ALL > LC_MESSAGES > LANG), the same order QLocale/the rest of the
@@ -58,7 +59,24 @@ QtObject {
       "Shut down": "시스템 종료",
       "Confirm restart": "재시작 확인",
       "Confirm shutdown": "종료 확인",
-      "Cancel": "취소"
+      "Cancel": "취소",
+      // Lock screen
+      "Session locked": "세션 잠김",
+      "Checking password": "비밀번호 확인 중",
+      "Too many attempts": "시도 횟수 초과",
+      "Authentication failed": "인증 실패",
+      "Press Enter to unlock": "Enter 키를 눌러 잠금 해제",
+      // Greeter
+      "Sign in to %1": "%1에 로그인",
+      "greetd socket unavailable": "greetd 소켓을 사용할 수 없음",
+      "Starting %1": "%1 시작 중",
+      "Authenticating": "인증 중",
+      "Signing in": "로그인 중",
+      "Sign in": "로그인",
+      "Enter a user name": "사용자 이름을 입력하세요",
+      "Enter a password": "비밀번호를 입력하세요",
+      "User": "사용자",
+      "Password": "비밀번호"
     }
   })
 

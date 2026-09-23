@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.Greetd
+import "i18n"
 
 ShellRoot {
   id: root
@@ -10,22 +11,22 @@ ShellRoot {
   property string sessionName: Quickshell.env("GREETER_SESSION_NAME") || "desktop"
   property string sessionCmd: Quickshell.env("GREETER_SESSION_CMD") || ""
 
-  property string status: Greetd.available ? "Sign in to " + sessionName : "greetd socket unavailable"
+  property string status: Greetd.available ? Tr.tr("Sign in to %1").arg(sessionName) : Tr.tr("greetd socket unavailable")
   property bool busy: false
 
   function submit() {
     if (busy || !Greetd.available) return;
     if (userField.text.length === 0) {
-      status = "Enter a user name";
+      status = Tr.tr("Enter a user name");
       return;
     }
     if (passwordField.text.length === 0) {
-      status = "Enter a password";
+      status = Tr.tr("Enter a password");
       return;
     }
 
     busy = true;
-    status = "Authenticating";
+    status = Tr.tr("Authenticating");
     Greetd.createSession(userField.text);
   }
 
@@ -38,13 +39,13 @@ ShellRoot {
     }
 
     function onReadyToLaunch() {
-      root.status = "Starting " + root.sessionName;
+      root.status = Tr.tr("Starting %1").arg(root.sessionName);
       Greetd.launch([root.sessionCmd]);
     }
 
     function onAuthFailure(message) {
       root.busy = false;
-      root.status = message || "Authentication failed";
+      root.status = message || Tr.tr("Authentication failed");
       passwordField.text = "";
       passwordField.forceActiveFocus();
     }
@@ -100,7 +101,7 @@ ShellRoot {
 
           Field {
             id: userField
-            label: "User"
+            label: Tr.tr("User")
             text: "thenist"
             enabled: !root.busy
             onAccepted: passwordField.forceActiveFocus()
@@ -108,7 +109,7 @@ ShellRoot {
 
           Field {
             id: passwordField
-            label: "Password"
+            label: Tr.tr("Password")
             password: true
             enabled: !root.busy
             onAccepted: root.submit()
@@ -122,7 +123,7 @@ ShellRoot {
 
             Text {
               anchors.centerIn: parent
-              text: root.busy ? "Signing in" : "Sign in"
+              text: root.busy ? Tr.tr("Signing in") : Tr.tr("Sign in")
               color: root.busy ? "#a5adcb" : "#11131a"
               font.pixelSize: 15
               font.weight: Font.DemiBold
