@@ -34,18 +34,46 @@ ShellRoot {
     function refreshBrightness(): void {
       systemState.refreshBrightness();
     }
+    function power(): void {
+      root.togglePower();
+    }
   }
   property string feedbackLabel: ""
   property real feedbackLevel: 0
   property string feedbackOutput: ""
   property bool feedbackVisible: false
   property bool audioInitialized: false
+  // Screen name the power menu is open on; empty while it is closed.
+  property string powerOutput: ""
+
+  readonly property bool powerOpen: powerOutput.length > 0
+
+  // Screen that currently has the focused workspace, falling back to the first
+  // screen so shell-triggered popups always land somewhere.
+  function focusedOutput() {
+    const focused = niri.workspaces.find(w => w.is_focused);
+    return focused ? focused.output : (Quickshell.screens.length ? Quickshell.screens[0].name : "");
+  }
+
+  function openPower(output) {
+    powerOutput = output && output.length > 0 ? output : root.focusedOutput();
+  }
+
+  function closePower() {
+    powerOutput = "";
+  }
+
+  function togglePower() {
+    if (root.powerOpen)
+      root.closePower();
+    else
+      root.openPower("");
+  }
 
   function showFeedback(label, level) {
     feedbackLabel = label;
     feedbackLevel = level;
-    const focused = niri.workspaces.find(w => w.is_focused);
-    feedbackOutput = focused ? focused.output : (Quickshell.screens.length ? Quickshell.screens[0].name : "");
+    feedbackOutput = root.focusedOutput();
     feedbackVisible = true;
     feedbackTimer.restart();
   }
@@ -237,10 +265,17 @@ ShellRoot {
       }
       exclusiveZone: 46
 
+      // Control center and power menu never show at the same time.
+      function toggleControls() {
+        controls.visible = !controls.visible;
+        if (controls.visible)
+          root.closePower();
+      }
+
       Rectangle {
         anchors.fill: parent
         radius: 12
-        color: "#11131add"
+        color: "#dd11131a"
         border.width: 1
         border.color: "#2f3344"
 
@@ -405,16 +440,28 @@ ShellRoot {
               if (root.sinkAudio)
                 root.setVolume(root.sinkAudio.volume + (delta > 0 ? 0.05 : -0.05));
             }
-            onClicked: controls.visible = !controls.visible
+            onClicked: panel.toggleControls()
           }
 
           ActionPill {
             id: controlsButton
             label: "󰒓"
             iconFont: true
-            tooltip: Tr.tr("Controls · sound, brightness, network and session")
+            tooltip: Tr.tr("Controls · sound, brightness and network")
             emphasized: controls.visible
-            onClicked: controls.visible = !controls.visible
+            onClicked: panel.toggleControls()
+          }
+
+          ActionPill {
+            id: powerButton
+            label: "󰐥"
+            iconFont: true
+            tooltip: Tr.tr("Power menu · Mod+Escape")
+            emphasized: root.powerOpen && root.powerOutput === panel.screen.name
+            onClicked: {
+              controls.visible = false;
+              root.openPower(panel.screen.name);
+            }
           }
         }
       }
@@ -424,7 +471,6 @@ ShellRoot {
         desktop: systemState
         audio: root.sinkAudio
         outputs: audioSinkModel
-        outputName: root.audioDeviceName(root.sink)
         onVolumeRequested: value => root.setVolume(value)
         onMuteRequested: root.toggleMute()
         onCommandRequested: command => root.run(command)
@@ -437,9 +483,16 @@ ShellRoot {
         }
       }
 
+      PowerMenu {
+        id: power
+        opened: root.powerOpen && root.powerOutput === panel.screen.name
+        onCloseRequested: root.closePower()
+        onCommandRequested: command => root.run(command)
+      }
+
       Feedback {
         screen: panel.screen
-        shown: root.feedbackVisible && root.feedbackOutput === panel.screen.name && !controls.visible
+        shown: root.feedbackVisible && root.feedbackOutput === panel.screen.name && !controls.visible && !power.opened
         label: root.feedbackLabel
         level: root.feedbackLevel
       }

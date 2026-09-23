@@ -7,6 +7,9 @@ Scope {
   id: root
   property real brightness: -1
   property string network: Tr.tr("Checking network…")
+  // Machine-readable companion to `network`, so the UI can color its status
+  // dot without parsing translated text.
+  property string networkKind: "unknown"
   property string error: ""
   property int pendingBrightness: -1
   signal brightnessAdjusted(real value)
@@ -77,21 +80,29 @@ Scope {
     stdout: StdioCollector {
       onStreamFinished: {
         const fields = text.trim().split(":");
-        if (fields[1] === "full")
+        if (fields[1] === "full") {
+          root.networkKind = "connected";
           root.network = Tr.tr("Connected · Internet available");
-        else if (fields[1] === "portal")
+        } else if (fields[1] === "portal") {
+          root.networkKind = "captive";
           root.network = Tr.tr("Sign-in required");
-        else if (fields[0].startsWith("connected"))
+        } else if (fields[0].startsWith("connected")) {
+          root.networkKind = "limited";
           root.network = Tr.tr("Connected · Limited connectivity");
-        else if (fields[0] === "connecting")
+        } else if (fields[0] === "connecting") {
+          root.networkKind = "connecting";
           root.network = Tr.tr("Connecting…");
-        else
+        } else {
+          root.networkKind = "offline";
           root.network = Tr.tr("Disconnected");
+        }
       }
     }
     onExited: (code, status) => {
-      if (code !== 0)
+      if (code !== 0) {
+        root.networkKind = "unknown";
         root.network = Tr.tr("Network status unavailable");
+      }
     }
   }
 

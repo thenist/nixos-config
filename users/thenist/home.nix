@@ -163,6 +163,7 @@ in
         Mod+D { spawn "fuzzel"; }
         Mod+Shift+Return { spawn "thunar"; }
         Mod+L { spawn "sh" "-c" "quickshell -n -p ~/.config/quickshell/lock/shell.qml"; }
+        Mod+Escape { spawn "sh" "-c" "quickshell ipc -p ~/.config/quickshell/panel/shell.qml call desktop power"; }
 
         XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
         XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
