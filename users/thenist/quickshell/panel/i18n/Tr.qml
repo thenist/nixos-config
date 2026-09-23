@@ -21,17 +21,10 @@ QtObject {
   readonly property var catalogs: ({
     ko: {
       // Bar
-      "Applications · Mod+D": "프로그램 · Mod+D",
-      "Workspace %1": "작업 공간 %1",
-      "Tray item": "트레이 항목",
       "muted": "음소거",
-      "Scroll: volume · Middle-click: mute": "스크롤: 볼륨 · 가운데 클릭: 음소거",
-      "Controls · sound, brightness and network": "제어 센터 · 소리, 밝기, 네트워크",
       "chg %1%": "충전 %1%",
       "bat %1%": "배터리 %1%",
       "full": "완충",
-      "unavailable": "사용 불가",
-      "unnamed output": "이름 없는 출력",
       // Date/time pattern for the clock (Qt pattern letters, names come from
       // the locale); Korean reads month/day/weekday rather than the English
       // weekday-first order.
@@ -57,7 +50,6 @@ QtObject {
       "Network settings ↗": "네트워크 설정 ↗",
       // Power menu
       "Power": "전원",
-      "Power menu · Mod+Escape": "전원 메뉴 · Mod+Escape",
       "Esc cancels": "Esc로 취소",
       "Unsaved work will be lost.": "저장하지 않은 작업은 사라집니다.",
       "Lock": "잠금",

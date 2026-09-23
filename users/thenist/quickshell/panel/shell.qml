@@ -1,7 +1,6 @@
 //@ pragma UseQApplication
 
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
@@ -121,14 +120,6 @@ ShellRoot {
 
   function run(command) {
     Quickshell.execDetached(["sh", "-c", command]);
-  }
-
-  function audioDeviceName(node) {
-    if (!node) {
-      return Tr.tr("unavailable");
-    }
-
-    return node.description || node.nickname || node.name || Tr.tr("unnamed output");
   }
 
   ScriptModel {
@@ -289,7 +280,6 @@ ShellRoot {
           ActionPill {
             label: "󱄅"
             iconFont: true
-            tooltip: Tr.tr("Applications · Mod+D")
             onClicked: root.run("fuzzel")
           }
 
@@ -333,7 +323,6 @@ ShellRoot {
                   emphasized: modelData.is_active
                   urgent: modelData.is_urgent || false
                   dimmed: !modelData.is_active && modelData.active_window_id === null
-                  tooltip: modelData.name || Tr.tr("Workspace %1").arg(modelData.idx)
                   onClicked: niri.focus(modelData.id)
                   onScrolled: delta => niri.step(panel.screen.name, delta > 0 ? -1 : 1)
                 }
@@ -384,9 +373,6 @@ ShellRoot {
                   acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
                   cursorShape: Qt.PointingHandCursor
                   hoverEnabled: true
-                  ToolTip.visible: containsMouse
-                  ToolTip.delay: 600
-                  ToolTip.text: modelData.tooltipTitle || modelData.title || Tr.tr("Tray item")
 
                   Rectangle {
                     anchors.fill: parent
@@ -434,7 +420,6 @@ ShellRoot {
             id: audioButton
 
             label: !root.sinkAudio ? "󰖁 —" : root.sinkAudio.muted ? "󰖁 " + Tr.tr("muted") : "󰕾 " + Math.round(root.sinkAudio.volume * 100) + "%"
-            tooltip: root.audioDeviceName(root.sink) + "\n" + Tr.tr("Scroll: volume · Middle-click: mute")
             onMiddleClicked: root.toggleMute()
             onScrolled: delta => {
               if (root.sinkAudio)
@@ -447,7 +432,6 @@ ShellRoot {
             id: controlsButton
             label: "󰒓"
             iconFont: true
-            tooltip: Tr.tr("Controls · sound, brightness and network")
             emphasized: controls.visible
             onClicked: panel.toggleControls()
           }
@@ -456,7 +440,6 @@ ShellRoot {
             id: powerButton
             label: "󰐥"
             iconFont: true
-            tooltip: Tr.tr("Power menu · Mod+Escape")
             emphasized: root.powerOpen && root.powerOutput === panel.screen.name
             onClicked: {
               controls.visible = false;
@@ -528,7 +511,6 @@ ShellRoot {
     property bool urgent: false
     property bool dimmed: false
     property bool iconFont: false
-    property string tooltip: ""
     property int maximumWidth: 10000
     signal clicked
     signal middleClicked
@@ -545,10 +527,6 @@ ShellRoot {
         duration: 120
       }
     }
-    ToolTip.visible: mouse.containsMouse && tooltip.length > 0
-    ToolTip.text: tooltip
-    ToolTip.delay: 600
-
     Text {
       id: text
 
