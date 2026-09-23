@@ -100,12 +100,8 @@ PopupWindow {
           color: "#8aadf4"
         }
         GradientStop {
-          position: 0.5
-          color: "#c6a0f6"
-        }
-        GradientStop {
           position: 1.0
-          color: "#ed8796"
+          color: "#c6a0f6"
         }
       }
     }
@@ -367,7 +363,6 @@ PopupWindow {
     id: button
 
     property bool selected: false
-    property bool destructive: false
     property bool iconFont: false
     property color foreground: "#cad3f5"
 
@@ -384,7 +379,7 @@ PopupWindow {
     contentItem: Text {
       text: button.text
       font: button.font
-      color: !button.enabled ? "#6e738d" : button.destructive ? "#ed8796" : button.selected ? "#8aadf4" : button.foreground
+      color: !button.enabled ? "#6e738d" : button.selected ? "#8aadf4" : button.foreground
       elide: Text.ElideRight
       verticalAlignment: Text.AlignVCenter
       horizontalAlignment: Text.AlignHCenter

@@ -16,6 +16,12 @@ PanelWindow {
   signal closeRequested
   signal commandRequested(string command)
 
+  // Every red in the dialog derives from these, so retinting the destructive
+  // action later is a one-place change.
+  readonly property color danger: "#ed8796"
+  readonly property color dangerHover: "#3a2028"
+  readonly property color dangerPressed: "#4a2530"
+
   // Empty while the action grid is shown, otherwise the action that is waiting
   // for confirmation ("reboot" / "poweroff").
   property string pending: ""
@@ -45,7 +51,7 @@ PanelWindow {
     {
       icon: "󰐥",
       label: Tr.tr("Shut down"),
-      accent: "#ed8796",
+      accent: menu.danger,
       command: "systemctl poweroff",
       confirm: "poweroff"
     }
@@ -178,12 +184,8 @@ PanelWindow {
             color: "#8aadf4"
           }
           GradientStop {
-            position: 0.5
-            color: "#c6a0f6"
-          }
-          GradientStop {
             position: 1.0
-            color: "#ed8796"
+            color: "#c6a0f6"
           }
         }
       }
@@ -200,7 +202,9 @@ PanelWindow {
           spacing: 10
           Text {
             text: "󰐥"
-            color: "#ed8796"
+            // Matches the strip's mauve; red stays reserved for the
+            // destructive action.
+            color: "#c6a0f6"
             font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 17
           }
@@ -345,14 +349,14 @@ PanelWindow {
     hoverEnabled: true
     background: Rectangle {
       radius: 10
-      color: button.destructive ? button.down ? "#4a2530" : button.hovered ? "#3a2028" : "#191d28" : button.down ? "#343a50" : button.hovered ? "#242838" : "#191d28"
+      color: button.destructive ? button.down ? menu.dangerPressed : button.hovered ? menu.dangerHover : "#191d28" : button.down ? "#343a50" : button.hovered ? "#242838" : "#191d28"
       border.width: 1
-      border.color: button.destructive ? "#ed8796" : "#2f3344"
+      border.color: button.destructive ? menu.danger : "#2f3344"
     }
     contentItem: Text {
       text: button.text
       font: button.font
-      color: button.destructive ? "#ed8796" : "#cad3f5"
+      color: button.destructive ? menu.danger : "#cad3f5"
       horizontalAlignment: Text.AlignHCenter
       verticalAlignment: Text.AlignVCenter
       elide: Text.ElideRight
