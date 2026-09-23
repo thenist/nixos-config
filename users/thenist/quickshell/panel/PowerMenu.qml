@@ -224,64 +224,118 @@ PanelWindow {
           }
         }
 
-        GridLayout {
+        // The action grid and the confirmation view always stay in the
+        // layout; each slot animates its own height between zero and its
+        // content height, so swapping views cross-fades and the dialog
+        // resizes by sliding instead of snapping to a new size.
+        Item {
+          id: actionSlot
+
+          readonly property bool active: menu.pending.length === 0
+
           Layout.fillWidth: true
-          columns: 2
-          rowSpacing: 10
-          columnSpacing: 10
-          visible: menu.pending.length === 0
+          Layout.preferredHeight: slotHeight
+          property real slotHeight: active ? actionGrid.implicitHeight : 0
+          clip: true
+          opacity: active ? 1 : 0
+          Behavior on slotHeight {
+            NumberAnimation {
+              duration: 190
+              easing.type: Easing.OutCubic
+            }
+          }
+          Behavior on opacity {
+            NumberAnimation {
+              duration: actionSlot.active ? 170 : 90
+              easing.type: Easing.OutCubic
+            }
+          }
 
-          Repeater {
-            model: menu.actions
+          GridLayout {
+            id: actionGrid
 
-            PowerTile {
-              required property int index
+            columns: 2
+            width: actionSlot.width
+            rowSpacing: 10
+            columnSpacing: 10
 
-              action: menu.actions[index]
-              highlighted: menu.highlighted === index
-              onHoveredChanged: {
-                if (hovered)
-                  menu.highlighted = index;
+            Repeater {
+              model: menu.actions
+
+              PowerTile {
+                required property int index
+
+                action: menu.actions[index]
+                highlighted: menu.highlighted === index
+                onHoveredChanged: {
+                  if (hovered)
+                    menu.highlighted = index;
+                }
+                onActivated: menu.activate(index)
               }
-              onActivated: menu.activate(index)
             }
           }
         }
 
-        ColumnLayout {
-          Layout.fillWidth: true
-          spacing: 14
-          visible: menu.pending.length > 0
+        Item {
+          id: confirmSlot
 
-          Text {
-            Layout.fillWidth: true
-            text: menu.pending === "reboot" ? Tr.tr("Confirm restart") : Tr.tr("Confirm shutdown")
-            color: "#cad3f5"
-            font.family: "Adwaita Sans"
-            font.pixelSize: 16
-            font.weight: Font.DemiBold
-          }
-          Text {
-            Layout.fillWidth: true
-            text: Tr.tr("Unsaved work will be lost.")
-            color: "#6e738d"
-            font.family: "Adwaita Sans"
-            font.pixelSize: 12
-            wrapMode: Text.Wrap
-          }
-          RowLayout {
-            Layout.fillWidth: true
-            spacing: 10
-            PowerButton {
-              Layout.fillWidth: true
-              text: Tr.tr("Cancel")
-              onClicked: menu.closeRequested()
+          readonly property bool active: menu.pending.length > 0
+
+          Layout.fillWidth: true
+          Layout.preferredHeight: slotHeight
+          property real slotHeight: active ? confirmView.implicitHeight : 0
+          clip: true
+          opacity: active ? 1 : 0
+          Behavior on slotHeight {
+            NumberAnimation {
+              duration: 190
+              easing.type: Easing.OutCubic
             }
-            PowerButton {
+          }
+          Behavior on opacity {
+            NumberAnimation {
+              duration: confirmSlot.active ? 170 : 90
+              easing.type: Easing.OutCubic
+            }
+          }
+
+          ColumnLayout {
+            id: confirmView
+
+            spacing: 14
+            width: confirmSlot.width
+
+            Text {
               Layout.fillWidth: true
-              destructive: true
-              text: menu.pendingAction ? menu.pendingAction.label : ""
-              onClicked: menu.confirm()
+              text: menu.pending === "reboot" ? Tr.tr("Confirm restart") : Tr.tr("Confirm shutdown")
+              color: "#cad3f5"
+              font.family: "Adwaita Sans"
+              font.pixelSize: 16
+              font.weight: Font.DemiBold
+            }
+            Text {
+              Layout.fillWidth: true
+              text: Tr.tr("Unsaved work will be lost.")
+              color: "#6e738d"
+              font.family: "Adwaita Sans"
+              font.pixelSize: 12
+              wrapMode: Text.Wrap
+            }
+            RowLayout {
+              Layout.fillWidth: true
+              spacing: 10
+              PowerButton {
+                Layout.fillWidth: true
+                text: Tr.tr("Cancel")
+                onClicked: menu.closeRequested()
+              }
+              PowerButton {
+                Layout.fillWidth: true
+                destructive: true
+                text: menu.pendingAction ? menu.pendingAction.label : ""
+                onClicked: menu.confirm()
+              }
             }
           }
         }

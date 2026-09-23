@@ -13,6 +13,8 @@ ShellRoot {
 
   property string status: Greetd.available ? Tr.tr("Sign in to %1").arg(sessionName) : Tr.tr("greetd socket unavailable")
   property bool busy: false
+  // Flipped after the first frame so the card eases in over the backdrop.
+  property bool revealed: false
 
   function submit() {
     if (busy || !Greetd.available) return;
@@ -77,6 +79,24 @@ ShellRoot {
         color: "#11131a"
         border.width: 1
         border.color: "#2f3344"
+        // Fade and ease the card in over the black backdrop. The backdrop
+        // itself never animates; the bindings still evaluate to the visible
+        // state even if the animation never runs.
+        opacity: root.revealed ? 1 : 0
+        scale: root.revealed ? 1 : 0.96
+        Behavior on opacity {
+          NumberAnimation {
+            duration: 220
+            easing.type: Easing.OutCubic
+          }
+        }
+        Behavior on scale {
+          NumberAnimation {
+            duration: 260
+            easing.type: Easing.OutCubic
+          }
+        }
+        Component.onCompleted: root.revealed = true
 
         Column {
           anchors.fill: parent

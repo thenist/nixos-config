@@ -10,6 +10,8 @@ ShellRoot {
   property string status: Tr.tr("Session locked")
   property string pendingPassword: ""
   property bool authenticating: false
+  // Flipped after the first frame so the card eases in over the backdrop.
+  property bool revealed: false
   signal clearPassword()
 
   function unlock(password) {
@@ -74,6 +76,25 @@ ShellRoot {
           color: "#11131a"
           border.width: 1
           border.color: "#2f3344"
+          // Fade and ease the card in over the black backdrop. The backdrop
+          // itself never animates, so nothing behind the lock surface is
+          // visible after locking; the bindings still evaluate to the visible
+          // state even if the animation never runs.
+          opacity: root.revealed ? 1 : 0
+          scale: root.revealed ? 1 : 0.96
+          Behavior on opacity {
+            NumberAnimation {
+              duration: 220
+              easing.type: Easing.OutCubic
+            }
+          }
+          Behavior on scale {
+            NumberAnimation {
+              duration: 260
+              easing.type: Easing.OutCubic
+            }
+          }
+          Component.onCompleted: root.revealed = true
 
           Column {
             anchors.fill: parent

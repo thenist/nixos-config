@@ -162,6 +162,52 @@ in
         }
     }
 
+    // niri animates all of this by default, but the stock parameters are
+    // critically damped and short enough to read as an instant jump. Same
+    // animations, retuned for visible motion: the window open/close easing
+    // gets a longer travel, and everything that moves geometry uses an
+    // underdamped spring, so it settles with a little overshoot instead of
+    // stopping dead. Damping stays under 1.0 because niri warns that
+    // overdamped springs glitch. Animations not listed here
+    // (config-notification, exit-confirmation, recent-windows) keep niri's
+    // defaults.
+    animations {
+        window-open {
+            duration-ms 220
+            curve "ease-out-expo"
+        }
+
+        window-close {
+            duration-ms 190
+            curve "ease-out-quad"
+        }
+
+        window-movement {
+            spring damping-ratio=0.9 stiffness=500 epsilon=0.0001
+        }
+
+        window-resize {
+            spring damping-ratio=0.9 stiffness=500 epsilon=0.0001
+        }
+
+        horizontal-view-movement {
+            spring damping-ratio=0.85 stiffness=600 epsilon=0.0001
+        }
+
+        workspace-switch {
+            spring damping-ratio=0.85 stiffness=700 epsilon=0.0001
+        }
+
+        overview-open-close {
+            spring damping-ratio=0.85 stiffness=500 epsilon=0.0001
+        }
+
+        screenshot-ui-open {
+            duration-ms 250
+            curve "ease-out-quad"
+        }
+    }
+
     binds {
         Mod+Shift+Slash { show-hotkey-overlay; }
 
