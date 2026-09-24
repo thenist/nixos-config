@@ -12,7 +12,17 @@ ShellRoot {
   property bool authenticating: false
   // Flipped after the first frame so the card eases in over the backdrop.
   property bool revealed: false
+  // Backs the clock text: a bare `new Date()` in a binding has no notify
+  // signal, so the date object has to be replaced for the text to re-evaluate.
+  property date now: new Date()
   signal clearPassword()
+
+  Timer {
+    interval: 1000
+    running: true
+    repeat: true
+    onTriggered: root.now = new Date()
+  }
 
   function unlock(password) {
     if (authenticating || password.length === 0) return;
@@ -103,7 +113,7 @@ ShellRoot {
 
             Text {
               width: parent.width
-              text: Qt.formatDateTime(new Date(), "HH:mm")
+              text: Qt.formatDateTime(root.now, "HH:mm")
               color: "#cad3f5"
               font.pixelSize: 42
               font.weight: Font.DemiBold
