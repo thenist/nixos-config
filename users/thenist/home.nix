@@ -212,7 +212,7 @@ in
         Mod+Shift+Slash { show-hotkey-overlay; }
 
         Mod+Return { spawn "foot"; }
-        Mod+D { spawn "fuzzel"; }
+        Mod+D { spawn "sh" "-c" "quickshell ipc -p ~/.config/quickshell/panel/shell.qml call desktop launcher"; }
         Mod+Shift+Return { spawn "thunar"; }
         Mod+L { spawn "sh" "-c" "quickshell -n -p ~/.config/quickshell/lock/shell.qml"; }
         Mod+Escape { spawn "sh" "-c" "quickshell ipc -p ~/.config/quickshell/panel/shell.qml call desktop power"; }
@@ -328,31 +328,6 @@ in
     font-italic=JetBrainsMono Nerd Font:style=Italic:size=11
     font-bold-italic=JetBrainsMono Nerd Font:style=Bold Italic:size=11
     pad=10x8
-  '';
-
-  xdg.configFile."fuzzel/fuzzel.ini".text = ''
-    font=Adwaita Sans:size=12
-    width=48
-    lines=12
-    horizontal-pad=18
-    vertical-pad=14
-    inner-pad=8
-
-    [colors]
-    background=11131aff
-    text=cad3f5ff
-    prompt=8aadf4ff
-    placeholder=6e738dff
-    input=cad3f5ff
-    match=f5bde6ff
-    selection=24273aff
-    selection-text=cad3f5ff
-    selection-match=f5bde6ff
-    border=8aadf4ff
-
-    [border]
-    width=1
-    radius=10
   '';
 
   xdg.configFile."mako/config".text = ''

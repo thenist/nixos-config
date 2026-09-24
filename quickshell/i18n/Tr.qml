@@ -60,6 +60,10 @@ QtObject {
       "Confirm restart": "재시작 확인",
       "Confirm shutdown": "종료 확인",
       "Cancel": "취소",
+      // Launcher
+      "Search applications…": "응용 프로그램 검색…",
+      "No matching applications": "일치하는 응용 프로그램 없음",
+      "Enter to launch · Esc to close": "Enter로 실행 · Esc로 닫기",
       // Lock screen
       "Session locked": "세션 잠김",
       "Checking password": "비밀번호 확인 중",

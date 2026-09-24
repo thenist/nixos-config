@@ -36,6 +36,9 @@ ShellRoot {
     function power(): void {
       root.togglePower();
     }
+    function launcher(): void {
+      root.toggleLauncher();
+    }
   }
   property string feedbackLabel: ""
   property real feedbackLevel: 0
@@ -44,8 +47,11 @@ ShellRoot {
   property bool audioInitialized: false
   // Screen name the power menu is open on; empty while it is closed.
   property string powerOutput: ""
+  // Screen name the launcher is open on; empty while it is closed.
+  property string launcherOutput: ""
 
   readonly property bool powerOpen: powerOutput.length > 0
+  readonly property bool launcherOpen: launcherOutput.length > 0
 
   // Screen that currently has the focused workspace, falling back to the first
   // screen so shell-triggered popups always land somewhere.
@@ -55,6 +61,7 @@ ShellRoot {
   }
 
   function openPower(output) {
+    closeLauncher();
     powerOutput = output && output.length > 0 ? output : root.focusedOutput();
   }
 
@@ -67,6 +74,21 @@ ShellRoot {
       root.closePower();
     else
       root.openPower("");
+  }
+
+  function openLauncher(output) {
+    launcherOutput = output && output.length > 0 ? output : root.focusedOutput();
+  }
+
+  function closeLauncher() {
+    launcherOutput = "";
+  }
+
+  function toggleLauncher() {
+    if (root.launcherOpen)
+      root.closeLauncher();
+    else
+      root.openLauncher("");
   }
 
   function showFeedback(label, level) {
@@ -120,6 +142,19 @@ ShellRoot {
 
   function run(command) {
     Quickshell.execDetached(["sh", "-c", command]);
+  }
+
+  // Desktop entries carry their own argv, so they go straight to execDetached
+  // instead of through a shell. Entries that set Path= are rare, so only those
+  // get a shell that chdirs first, with the argv passed positionally so it is
+  // never re-interpreted. execDetached's object overload is not an option here:
+  // QML only converts an argument written as a literal into a ProcessContext,
+  // and the argv is only known at runtime.
+  function launch(command, workingDirectory) {
+    if (workingDirectory && workingDirectory.length > 0)
+      Quickshell.execDetached(["sh", "-c", "cd \"$1\" && exec \"$@\"", "sh", workingDirectory].concat(command));
+    else
+      Quickshell.execDetached(command);
   }
 
   ScriptModel {
@@ -256,11 +291,13 @@ ShellRoot {
       }
       exclusiveZone: 46
 
-      // Control center and power menu never show at the same time.
+      // Control center, power menu and launcher never show at the same time.
       function toggleControls() {
         controls.visible = !controls.visible;
-        if (controls.visible)
+        if (controls.visible) {
           root.closePower();
+          root.closeLauncher();
+        }
       }
 
       Rectangle {
@@ -280,7 +317,8 @@ ShellRoot {
           ActionPill {
             label: "󱄅"
             iconFont: true
-            onClicked: root.run("fuzzel")
+            emphasized: root.launcherOpen && root.launcherOutput === panel.screen.name
+            onClicked: root.toggleLauncher()
           }
 
           Flickable {
@@ -473,9 +511,22 @@ ShellRoot {
         onCommandRequested: command => root.run(command)
       }
 
+      Launcher {
+        id: launcher
+        opened: root.launcherOpen && root.launcherOutput === panel.screen.name
+        onOpenedChanged: {
+          if (opened) {
+            controls.visible = false;
+            root.closePower();
+          }
+        }
+        onCloseRequested: root.closeLauncher()
+        onLaunchRequested: (command, workingDirectory) => root.launch(command, workingDirectory)
+      }
+
       Feedback {
         screen: panel.screen
-        shown: root.feedbackVisible && root.feedbackOutput === panel.screen.name && !controls.visible && !power.opened
+        shown: root.feedbackVisible && root.feedbackOutput === panel.screen.name && !controls.visible && !power.opened && !launcher.opened
         label: root.feedbackLabel
         level: root.feedbackLevel
       }

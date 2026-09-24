@@ -152,7 +152,6 @@
       xdg-desktop-portal-gtk
       xdg-desktop-portal-wlr
       foot
-      fuzzel
       mako
       swayidle
       grim
