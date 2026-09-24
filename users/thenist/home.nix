@@ -32,8 +32,10 @@ in
   # edit here.
   programs.git = {
     enable = true;
-    userName = "thenist";
-    userEmail = "p717394@gmail.com";
+    settings = {
+      user.name = "thenist";
+      user.email = "p717394@gmail.com";
+    };
   };
 
   programs.vim = {
