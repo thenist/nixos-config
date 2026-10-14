@@ -20,6 +20,7 @@
       konnect # KiCAD MCP server (flaked in from github:mixelpixx/Konnect)
       orca-slicer
       discord
+      slack
       qbittorrent
       parsec-bin
       opencode
