@@ -95,7 +95,8 @@
         "home-manager": "home-manager",
         "konnect": "konnect",
         "nixos-hardware": "nixos-hardware",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_2",
+        "solidcraft": "solidcraft"
       }
     },
     "rust-overlay": {
@@ -116,6 +117,26 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "solidcraft": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793665827,
+        "narHash": "sha256-9lbmF629Jlw40oP7xGyWa5Gx7uv85nOgxU1Lt/In91E=",
+        "owner": "tangency-labs",
+        "repo": "solidcraft",
+        "rev": "147b4049cf6db6e23c687f4550ebbe4272880437",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tangency-labs",
+        "repo": "solidcraft",
         "type": "github"
       }
     }

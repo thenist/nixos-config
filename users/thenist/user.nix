@@ -17,6 +17,7 @@
       prismlauncher
       freecad
       kicad
+      solidcraft # parametric 3D CAD (flaked in from github:tangency-labs/solidcraft)
       konnect # KiCAD MCP server (flaked in from github:mixelpixx/Konnect)
       orca-slicer
       discord
