@@ -52,6 +52,20 @@
           }} -C "$smlibDir" --strip-components=1
           echo ${smlibSha256} > "$smlibDir/.sha256"
         '';
+        # egui has no font fallback of its own: crates/ui-egui searches hardcoded FHS
+        # paths (/usr/share/fonts, ~/.local/share/fonts, ...) for a CJK and a Hangul
+        # face, so on NixOS it finds none and a Korean UI or Hangul text is tofu.
+        # SOLIDCRAFT_FONT_DIRS is the only hook, and it probes exact file names, so
+        # alias the Noto CJK collection (which also draws Hangul) to the name it looks
+        # for. Overridable by the user's own SOLIDCRAFT_FONT_DIRS.
+        postFixup = (old.postFixup or "") + ''
+          wrapProgram $out/bin/solidcraft \
+            --set-default SOLIDCRAFT_FONT_DIRS ${pkgs.runCommandLocal "solidcraft-fonts" { } ''
+              mkdir -p $out
+              ln -s ${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk/NotoSansCJK-VF.otf.ttc \
+                $out/NotoSansCJK-Regular.ttc
+            ''}
+        '';
       });
     extrasOverlay = _final: prev: {
       konnect = konnect.packages.${prev.stdenv.hostPlatform.system}.konnect;
