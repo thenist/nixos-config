@@ -25,11 +25,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791642191,
-        "narHash": "sha256-0bK0A59rVUn1SRZzo4cNi4VSqAe7vR1gL2/MZl53Frw=",
+        "lastModified": 1793979366,
+        "narHash": "sha256-7OoWDsYO9teiPxl0QdlS5lYE20Pue8/5mpscSL32FUA=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "c58f54c733a7894d84fa2fdff26cc12088c4b78c",
+        "rev": "2c0c1f01521469cf0271180c453c79782d53c2f6",
         "type": "github"
       },
       "original": {
@@ -47,11 +47,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1791234235,
-        "narHash": "sha256-PtpB8QJ4ozD58UepbpLORpAdYDi/SH9oba0ajv8eE1U=",
+        "lastModified": 1793581878,
+        "narHash": "sha256-X6xZeHuWb7+i+T5WApGt5rXI4heUCwm/ybbilx/NGEE=",
         "owner": "mixelpixx",
         "repo": "Konnect",
-        "rev": "9488e5f09717cb508cb25779dc16586d1f06f758",
+        "rev": "676efce43c9779f9f9e59a9181cb0746c6452650",
         "type": "github"
       },
       "original": {
@@ -88,11 +88,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1791721963,
-        "narHash": "sha256-BYhx89XJltnRyQeuDKHVL5eSqbbfAcOKuDts7QRsrxQ=",
+        "lastModified": 1793871777,
+        "narHash": "sha256-DbFyxXHjP4SJDWVVIILkgrUZxj29cDusi8ULXoQGuZ8=",
         "owner": "NixOS",
         "repo": "nixos-hardware",
-        "rev": "60a624466c08787ee8303393b7d4752d1826f14f",
+        "rev": "d645c71a58dbae3eb17ff551a07aea13a541cb1a",
         "type": "github"
       },
       "original": {
@@ -117,11 +117,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1791734076,
-        "narHash": "sha256-i5qk1kLiit98rRbh1AXmWBNT9QXC/y4l5Wk/u5EdpDQ=",
+        "lastModified": 1793726008,
+        "narHash": "sha256-jQp1wKvbwWdLBASTXkSi/VYmDJ5AbBi1WvcMt9HWJC8=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "7fd4004d0511991fff3a0524856a9be09e28c5f0",
+        "rev": "1d060086d60cb76a40cf37109f979d88a5bd6396",
         "type": "github"
       },
       "original": {
@@ -185,11 +185,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793665827,
-        "narHash": "sha256-9lbmF629Jlw40oP7xGyWa5Gx7uv85nOgxU1Lt/In91E=",
+        "lastModified": 1794000797,
+        "narHash": "sha256-JQorL6IskYRVclYNc7tDXT6eyUe+5o1bd8t2JzdPhUk=",
         "owner": "tangency-labs",
         "repo": "solidcraft",
-        "rev": "147b4049cf6db6e23c687f4550ebbe4272880437",
+        "rev": "871014f955a76fd308ce156e68c93e6372906005",
         "type": "github"
       },
       "original": {
