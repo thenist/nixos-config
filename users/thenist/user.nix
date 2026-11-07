@@ -24,7 +24,6 @@
       slack
       qbittorrent
       parsec-bin
-      opencode
       norminette
       ollama
       bun
