@@ -27,9 +27,19 @@
       url = "github:tangency-labs/solidcraft";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # ROS 2 packages (rosPackages.<distro>). Upstream pins its own nixpkgs,
+    # which is older than this config requires (services.zapret2), so follow
+    # this flake's nixpkgs like konnect and solidcraft do. Consequence: ROS
+    # derivations differ from the ros.cachix.org builds, which are pinned to
+    # upstream's lock, so the cache is best-effort (see common.nix).
+    nix-ros-overlay = {
+      url = "github:lopsided98/nix-ros-overlay/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, nixos-hardware, konnect, solidcraft, ... }: let
+  outputs = { nixpkgs, home-manager, nixos-hardware, konnect, solidcraft, nix-ros-overlay, ... }: let
     # crates/smlib links the SMLib C API as a prebuilt archive published in the
     # tangency-labs/smlib release named by crates/smlib/SMLIB_REV, but its build
     # script only looks in the unpacked source tree
@@ -88,7 +98,7 @@
         nixos-hardware.nixosModules.lenovo-thinkpad-t480
         home-manager.nixosModules.home-manager
         {
-          nixpkgs.overlays = [ extrasOverlay ];
+          nixpkgs.overlays = [ nix-ros-overlay.overlays.default extrasOverlay ];
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
@@ -108,7 +118,7 @@
         ./users/thenist/user.nix
         home-manager.nixosModules.home-manager
         {
-          nixpkgs.overlays = [ extrasOverlay ];
+          nixpkgs.overlays = [ nix-ros-overlay.overlays.default extrasOverlay ];
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
@@ -128,7 +138,7 @@
         ./users/thenist/user.nix
         home-manager.nixosModules.home-manager
         {
-          nixpkgs.overlays = [ extrasOverlay ];
+          nixpkgs.overlays = [ nix-ros-overlay.overlays.default extrasOverlay ];
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
