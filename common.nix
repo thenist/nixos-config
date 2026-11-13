@@ -72,6 +72,12 @@
   services.tumbler.enable = true;
   services.upower.enable = true;
 
+  # USB device nodes default to root:root 0664, so non-root users cannot
+  # open vendor 2a0e devices read-write.
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="2a0e", MODE="0666"
+  '';
+
   # Compressed RAM swap (zstd, capped at 50% of RAM). No host has disk swap.
   zramSwap.enable = true;
 
