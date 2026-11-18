@@ -11,14 +11,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # KiCAD MCP server. Upstream flake builds the Rust binary against a
-    # pinned toolchain and tracks its own nixpkgs, which we override so the
-    # whole system shares one nixpkgs revision.
-    konnect = {
-      url = "github:mixelpixx/Konnect";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # SolidCraft (parametric 3D CAD). Not in nixpkgs; upstream's flake packages
     # it with rustPlatform and wraps the GUI with the Wayland/EGL/dbus paths it
     # dlopens. Pinned nixpkgs is followed so it builds against this system's
@@ -30,7 +22,7 @@
 
     # ROS 2 packages (rosPackages.<distro>). Upstream pins its own nixpkgs,
     # which is older than this config requires (services.zapret2), so follow
-    # this flake's nixpkgs like konnect and solidcraft do. Consequence: ROS
+    # this flake's nixpkgs like solidcraft does. Consequence: ROS
     # derivations differ from the ros.cachix.org builds, which are pinned to
     # upstream's lock, so the cache is best-effort (see common.nix).
     nix-ros-overlay = {
@@ -39,7 +31,7 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, nixos-hardware, konnect, solidcraft, nix-ros-overlay, ... }: let
+  outputs = { nixpkgs, home-manager, nixos-hardware, solidcraft, nix-ros-overlay, ... }: let
     # crates/smlib links the SMLib C API as a prebuilt archive published in the
     # tangency-labs/smlib release named by crates/smlib/SMLIB_REV, but its build
     # script only looks in the unpacked source tree
@@ -78,11 +70,9 @@
         '';
       });
     extrasOverlay = _final: prev: {
-      konnect = konnect.packages.${prev.stdenv.hostPlatform.system}.konnect;
       solidcraft = tweakSolidcraft prev;
     };
   in {
-    packages.x86_64-linux.konnect = konnect.packages.x86_64-linux.konnect;
     packages.x86_64-linux.solidcraft = tweakSolidcraft nixpkgs.legacyPackages.x86_64-linux;
 
     # use "nixos", or your hostname as the name of the configuration
