@@ -14,12 +14,6 @@
 
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
-
-    # Prebuilt nix-ros-overlay packages are published to ros.cachix.org.
-    # extra-* appends to Nix's defaults, so cache.nixos.org remains a
-    # substituter with its key trusted.
-    extra-substituters = [ "https://ros.cachix.org" ];
-    extra-trusted-public-keys = [ "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=" ];
   };
 
   # Configure network proxy if necessary
