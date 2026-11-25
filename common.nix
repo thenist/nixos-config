@@ -62,7 +62,6 @@
 
   services.gvfs.enable = true;
   services.udisks2.enable = true;
-  services.tumbler.enable = true;
   services.upower.enable = true;
 
   # Noctalia's Bluetooth and power-profile widgets (bar and Control Center)
@@ -218,7 +217,6 @@
       pavucontrol
       wlr-randr
       wdisplays
-      thunar
       adwaita-fonts
       libnotify
       playerctl

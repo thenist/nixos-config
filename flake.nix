@@ -21,9 +21,15 @@
       url = "github:tangency-labs/solidcraft/release";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Luciole, the Noctalia project's file manager. It is not in nixpkgs, so
+    # this input carries upstream's own nixpkgs pin and toolchain.
+    luciole = {
+      url = "github:noctalia-dev/luciole";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, nixos-hardware, solidcraft, ... }: let
+  outputs = { nixpkgs, home-manager, nixos-hardware, solidcraft, luciole, ... }: let
     tweakSolidcraft = pkgs:
       (solidcraft.packages.${pkgs.stdenv.hostPlatform.system}.solidcraft).overrideAttrs (old: {
         # egui has no font fallback of its own: crates/ui-egui searches hardcoded FHS
@@ -66,6 +72,7 @@
             useUserPackages = true;
             users.thenist = import ./users/thenist/home.nix;
             backupFileExtension = "backup";
+            sharedModules = [ luciole.homeModules.default ];
           };
         }
       ];
@@ -86,6 +93,7 @@
             useUserPackages = true;
             users.thenist = import ./users/thenist/home.nix;
             backupFileExtension = "backup";
+            sharedModules = [ luciole.homeModules.default ];
           };
         }
       ];
@@ -106,6 +114,7 @@
             useUserPackages = true;
             users.thenist = import ./users/thenist/home.nix;
             backupFileExtension = "backup";
+            sharedModules = [ luciole.homeModules.default ];
           };
         }
       ];

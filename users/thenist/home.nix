@@ -40,7 +40,7 @@
         # without needing qt6ct and a manually selected scheme.
         templates = {
           enable_builtin_templates = true;
-          builtin_ids = [ "gtk3" "gtk4" "foot" ];
+          builtin_ids = [ "gtk3" "gtk4" "foot" "luciole" ];
         };
       };
 
@@ -100,6 +100,14 @@
 
       lockscreen.enabled = true;
     };
+  };
+
+  # Noctalia's own file manager, installed by the upstream flake input. The
+  # built-in `luciole` template below writes ~/.config/luciole/colors.toml,
+  # which Luciole reads live (its color_scheme defaults to "auto"). Layout and
+  # behaviour preferences stay in Luciole's GUI-managed settings.toml.
+  programs.luciole = {
+    enable = true;
   };
 
   programs.vscode = {
@@ -311,7 +319,7 @@
 
         Mod+Return { spawn "foot"; }
         Mod+D { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
-        Mod+Shift+Return { spawn "thunar"; }
+        Mod+Shift+Return { spawn "luciole"; }
         Mod+L { spawn "noctalia" "msg" "session" "lock"; }
         Mod+Escape { spawn "noctalia" "msg" "panel-toggle" "session"; }
         Mod+S { spawn "noctalia" "msg" "panel-toggle" "control-center"; }
@@ -405,6 +413,13 @@
         Ctrl+Alt+Delete { quit; }
     }
   '';
+
+  # Folders opened through xdg-open, FileManager1 or a portal go to Luciole
+  # now that Thunar is gone. mimeApps is opt-in in home-manager.
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications."inode/directory" = "dev.noctalia.luciole.desktop";
+  };
 
   # Noctalia's foot template writes the palette to
   # ~/.config/foot/themes/noctalia at runtime. The include has to be
