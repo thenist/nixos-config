@@ -28,7 +28,7 @@
       bun
       omp
       dsview
-      (callPackage ../../pkgs/deepseek-harness { })
+      deepseek-harness
     ];
   };
 }
