@@ -1,20 +1,94 @@
-{ config, lib, pkgs, ... }:
+{ lib, pkgs, ... }:
 
-let
-  # swayidle's -w waits for commands to exit. Detach the timeout lock so sleep
-  # events cannot queue behind it and re-lock the session after authentication.
-  idleLockCommand = "quickshell -n -d -p ~/.config/quickshell/lock/shell.qml";
-  # Quickshell resolves imports against the shell's own directory, so each
-  # config gets the shared i18n singleton merged in (quickshell/with-i18n.nix).
-  quickshellConfig = name: import ../../quickshell/with-i18n.nix {
-    inherit pkgs;
-    dir = ./quickshell/${name};
-  };
-in
 {
   home.username = "thenist";
   home.homeDirectory = "/home/thenist";
   home.stateVersion = "26.11";
+
+  # Noctalia v5 (native Wayland shell, not Quickshell) replaces the old
+  # custom Quickshell panel and lock screen plus mako, swayidle, swaybg,
+  # polkit-gnome and nm-applet. The home-manager module validates the
+  # settings at build time and starts the shell as a systemd user service on
+  # graphical-session.target, which niri-session starts once niri is ready.
+  programs.noctalia = {
+    enable = true;
+    systemd.enable = true;
+    checkConfig = true;
+
+    settings = {
+      shell = {
+        # Noctalia's polkit agent replaces polkit_gnome.
+        polkit_agent = true;
+        # The config is declarative; suppress the first-run wizard so it
+        # cannot seed GUI overrides before the user sees the shell.
+        setup_wizard_enabled = false;
+        niri_overview_type_to_launch_enabled = true;
+        niri_overview_close_on_launch_enabled = true;
+        launch_apps_as_systemd_services = true;
+      };
+
+      # Catppuccin matches the old shell's palette and the greeter scheme.
+      theme = {
+        mode = "dark";
+        source = "builtin";
+        builtin = "Catppuccin";
+      };
+
+      wallpaper = {
+        enabled = true;
+        fill_mode = "crop";
+        default.path = "${./wallpaper.png}";
+      };
+
+      # niri's overview backdrop gets a blurred copy of the wallpaper; the
+      # layer-rule in the niri config below places the noctalia-backdrop
+      # layer inside it.
+      backdrop = {
+        enabled = true;
+        blur_intensity = 0.5;
+        tint_intensity = 0.3;
+      };
+
+      notification = {
+        enable_daemon = true;
+        follow_focused_output = true;
+      };
+
+      # Replaces swayidle. niri supports ext_idle_notifier_v1, and Noctalia
+      # also locks before sleep via logind's PrepareForSleep.
+      idle = {
+        behavior.lock = {
+          timeout = 600;
+          action = "lock";
+          enabled = true;
+        };
+        behavior."screen-off" = {
+          timeout = 660;
+          action = "screen_off";
+          enabled = true;
+        };
+      };
+
+      bar.main = {
+        position = "top";
+        thickness = 34;
+        start = [ "launcher" "workspaces" ];
+        center = [ "clock" ];
+        end = [
+          "media"
+          "tray"
+          "notifications"
+          "network"
+          "volume"
+          "battery"
+          "control-center"
+          "session"
+        ];
+      };
+
+      lockscreen.enabled = true;
+    };
+  };
 
   programs.vscode = {
     enable = true;
@@ -126,16 +200,33 @@ in
 
     // fcitx5 speaks input-method-v2, so it is the IME for niri's text-input-v3
     // clients. -d detaches; the next login's spawn is a no-op if one is
-    // already running.
+    // already running. Everything else (bar, notifications, idle lock,
+    // wallpaper, polkit agent, network applet) is Noctalia, started by its
+    // systemd user service rather than here.
     spawn-at-startup "fcitx5" "-d"
-    spawn-at-startup "sh" "-c" "quickshell -p ~/.config/quickshell/panel/shell.qml"
-    spawn-at-startup "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
-    spawn-at-startup "nm-applet"
-    spawn-at-startup "mako"
-    spawn-at-startup "sh" "-c" "swaybg -i ~/.wallpaper.png -m fill"
-    spawn-at-startup "swayidle" "-w" "timeout" "600" "${idleLockCommand}" "before-sleep" "${idleLockCommand}; sleep 1"
 
     prefer-no-csd
+
+    // Noctalia draws a blurred copy of the wallpaper into niri's overview
+    // backdrop (see [backdrop] in programs.noctalia.settings).
+    layer-rule {
+        match namespace="^noctalia-backdrop"
+        place-within-backdrop true
+    }
+
+    // Noctalia's settings window is a regular toplevel; float it instead of
+    // tiling it into the current column.
+    window-rule {
+        match app-id="dev.noctalia.Noctalia"
+        open-floating true
+        default-column-width { fixed 1080; }
+        default-window-height { fixed 920; }
+    }
+
+    // Lets Noctalia's notification actions and window activation work.
+    debug {
+        honor-xdg-activation-with-invalid-serial
+    }
 
     screenshot-path "~/Pictures/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
@@ -207,16 +298,21 @@ in
         Mod+Shift+Slash { show-hotkey-overlay; }
 
         Mod+Return { spawn "foot"; }
-        Mod+D { spawn "sh" "-c" "quickshell ipc -p ~/.config/quickshell/panel/shell.qml call desktop launcher"; }
+        Mod+D { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
         Mod+Shift+Return { spawn "thunar"; }
-        Mod+L { spawn "sh" "-c" "quickshell -n -p ~/.config/quickshell/lock/shell.qml"; }
-        Mod+Escape { spawn "sh" "-c" "quickshell ipc -p ~/.config/quickshell/panel/shell.qml call desktop power"; }
+        Mod+L { spawn "noctalia" "msg" "session" "lock"; }
+        Mod+Escape { spawn "noctalia" "msg" "panel-toggle" "session"; }
+        Mod+S { spawn "noctalia" "msg" "panel-toggle" "control-center"; }
+        Mod+Shift+Comma { spawn "noctalia" "msg" "settings-toggle"; }
 
+        // Hardware keys stay on wpctl/brightnessctl: they work with
+        // allow-when-locked and from a TTY, and Noctalia's PipeWire and
+        // backlight services drive its OSD from the resulting changes.
         XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
         XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
         XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
-        XF86MonBrightnessUp allow-when-locked=true { spawn "sh" "-c" "brightnessctl --class=backlight --min-value=1 set +5% && quickshell ipc -p ~/.config/quickshell/panel/shell.qml call desktop refreshBrightness"; }
-        XF86MonBrightnessDown allow-when-locked=true { spawn "sh" "-c" "brightnessctl --class=backlight --min-value=1 set 5%- && quickshell ipc -p ~/.config/quickshell/panel/shell.qml call desktop refreshBrightness"; }
+        XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "--min-value=1" "set" "+5%"; }
+        XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "--min-value=1" "set" "5%-"; }
 
         Mod+Q { close-window; }
 
@@ -298,9 +394,6 @@ in
     }
   '';
 
-  xdg.configFile."quickshell/panel".source = quickshellConfig "panel";
-  xdg.configFile."quickshell/lock".source = quickshellConfig "lock";
-
   xdg.configFile."foot/foot.ini".text = ''
     [main]
     font=JetBrainsMono Nerd Font:size=11
@@ -308,18 +401,6 @@ in
     font-italic=JetBrainsMono Nerd Font:style=Italic:size=11
     font-bold-italic=JetBrainsMono Nerd Font:style=Bold Italic:size=11
     pad=10x8
-  '';
-
-  xdg.configFile."mako/config".text = ''
-    font=Adwaita Sans 11
-    background-color=#11131aee
-    text-color=#cad3f5ff
-    border-color=#8aadf4ff
-    border-size=1
-    border-radius=10
-    padding=12
-    margin=12
-    default-timeout=5000
   '';
 
   gtk = {
@@ -358,6 +439,4 @@ in
     package = pkgs.whitesur-cursors;
     gtk.enable = true;
   };
-
-  home.file.".wallpaper.png".source = ./wallpaper.png;
 }

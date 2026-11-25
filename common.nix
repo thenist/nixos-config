@@ -49,7 +49,6 @@
 
   services.dbus.enable = true;
   security.polkit.enable = true;
-  security.pam.services.quickshell-lock = {};
   programs.dconf.enable = true;
 
   xdg.portal = {
@@ -77,6 +76,9 @@
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
+
+  # Freedesktop sound theme for Noctalia's notification sounds.
+  xdg.sounds.enable = true;
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -198,22 +200,16 @@
      gcc
      unrar
       gnumake
-      quickshell
-      cage
       xwayland-satellite
       xdg-desktop-portal
       xdg-desktop-portal-gtk
       xdg-desktop-portal-wlr
       foot
-      mako
-      swayidle
       grim
       slurp
       wl-clipboard
       brightnessctl
       pavucontrol
-      networkmanagerapplet
-      polkit_gnome
       wlr-randr
       wdisplays
       thunar

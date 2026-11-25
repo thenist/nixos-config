@@ -1,49 +1,50 @@
-# Quickshell greeter launched through greetd. The desktop session it starts
-# after authentication is configured per host via the greeter.* options
-# (niri.nix sets them for the niri hosts).
+# Noctalia Greeter, a greetd login screen. It runs its own wlroots compositor
+# and starts the .desktop session named in [session].default (niri ships
+# "Niri"). The desktop shell itself is configured in users/thenist/home.nix;
+# this file only covers the login screen.
 
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 
-let
-  cfg = config.greeter;
-  greeterConfig = import ./quickshell/with-i18n.nix {
-    inherit pkgs;
-    dir = ./quickshell/greeter;
-  };
-  quickshellGreeter = pkgs.writeShellScript "quickshell-greeter" ''
-    export QT_QPA_PLATFORM=wayland
-    export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-    export GREETER_SESSION_NAME=${lib.escapeShellArg cfg.sessionName}
-    export GREETER_SESSION_CMD=${lib.escapeShellArg cfg.sessionCommand}
-    # The greeter runs outside any user session, so it has no locale to inherit;
-    # the i18n singleton reads LANG to pick the login screen's language.
-    ${lib.optionalString (config.i18n.defaultLocale != null)
-      "export LANG=${lib.escapeShellArg config.i18n.defaultLocale}"}
-    exec ${pkgs.cage}/bin/cage -- ${pkgs.quickshell}/bin/quickshell -p /etc/quickshell/greeter/shell.qml
-  '';
-in
 {
-  options.greeter = {
-    sessionName = lib.mkOption {
-      type = lib.types.str;
-      description = "Name of the desktop session shown by the greeter.";
-    };
+  services.displayManager.noctalia-greeter = {
+    enable = true;
 
-    sessionCommand = lib.mkOption {
-      type = lib.types.str;
-      description = "Command the greeter launches after a successful login.";
-    };
-  };
+    settings = {
+      # Single-user hosts: open directly on the password step.
+      session.default = "Niri";
+      user.default = "thenist";
 
-  config = {
-    services.greetd = {
-      enable = true;
-      settings.default_session = {
-        command = "${quickshellGreeter}";
-        user = "greeter";
+      appearance = {
+        # Same palette as the shell (users/thenist/home.nix), so the login
+        # screen and the session it starts look like one system.
+        scheme = "Catppuccin";
+        theme_mode = "dark";
+        wallpaper = {
+          # Interpolating the path copies the repo wallpaper into the store.
+          # The greeter runs as the unprivileged `greeter` user and cannot
+          # read /home/thenist (0700), unlike the shell's own wallpaper path.
+          path = "${./users/thenist/wallpaper.png}";
+          fill_mode = "crop";
+          blur = 0.35;
+          tint = 0.15;
+        };
       };
-    };
 
-    environment.etc."quickshell/greeter".source = greeterConfig;
+      clock = {
+        enabled = true;
+        time_format = "{:%H:%M}";
+        date_format = "%A, %x";
+      };
+
+      cursor = {
+        theme = "WhiteSur-cursors";
+        path = "${pkgs.whitesur-cursors}/share/icons";
+        size = 24;
+      };
+
+      # fcitx5 is not running in the greeter and passwords are ASCII, so match
+      # the session's base layout to keep key positions predictable.
+      keyboard.layout = "us";
+    };
   };
 }

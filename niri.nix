@@ -1,15 +1,10 @@
-# niri desktop session, imported by hosts that run niri. The shared greeter
-# lives in greeter.nix and portal setup in common.nix.
+# niri desktop session, imported by hosts that run niri. The greetd login
+# screen lives in greeter.nix and portal setup in common.nix. The bar,
+# wallpaper, notifications and idle handling are owned by Noctalia
+# (users/thenist/home.nix), which starts as a systemd user service.
 
-{ config, pkgs, ... }:
+{ ... }:
 
 {
   programs.niri.enable = true;
-
-  greeter.sessionName = "niri";
-  greeter.sessionCommand = "/run/current-system/sw/bin/niri-session";
-
-  environment.systemPackages = with pkgs; [
-    swaybg # niri has no built-in wallpaper support
-  ];
 }
