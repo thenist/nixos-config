@@ -97,14 +97,42 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Install and configure ibus for hangul input.
+  # Korean input: fcitx5 with the libhangul-based hangul engine (the same
+  # engine ibus-hangul wraps, so composition behaviour is unchanged). fcitx5
+  # implements both input-method-v1 and -v2, so it drives niri's text-input-v3
+  # clients directly, and it re-injects unhandled keys through the compositor's
+  # virtual keyboard instead of relying on forward_key_event, which is what the
+  # old ibus setup could not do on Wayland.
+  #
+  # waylandFrontend leaves GTK_IM_MODULE/QT_IM_MODULE unset so GTK 3/4 and
+  # Qt >= 6.8.2 use text-input-v3; XMODIFIERS is set for X11/XWayland apps.
+  # The niri keymap makes right Alt the Hangul key, so keep it as the toggle,
+  # as before, with Ctrl+Space as the fallback.
   i18n.inputMethod = {
-    type = "ibus";
+    type = "fcitx5";
     enable = true;
-    ibus.waylandFrontend = true;
-    ibus.engines = with pkgs.ibus-engines; [
-      hangul
-    ];
+    fcitx5 = {
+      waylandFrontend = true;
+      addons = with pkgs; [
+        fcitx5-hangul
+        qt6Packages.fcitx5-configtool
+      ];
+      settings = {
+        globalOptions.Hotkey.TriggerKeys = "Hangul,Control+space";
+        # Default group: US layout plus the Hangul engine. Starting on
+        # keyboard-us keeps a fresh session English until the toggle is hit.
+        inputMethod = {
+          "Groups/0" = {
+            Name = "Default";
+            "Default Layout" = "us";
+            DefaultIM = "keyboard-us";
+          };
+          "Groups/0/Items/0".Name = "keyboard-us";
+          "Groups/0/Items/1".Name = "hangul";
+          "GroupOrder"."0" = "Default";
+        };
+      };
+    };
   };
 
   # Install firefox. Its light/dark theme follows the system color scheme,

@@ -1,9 +1,6 @@
 { config, lib, pkgs, ... }:
 
 let
-  ibusPackage = pkgs.ibus-with-plugins.override {
-    plugins = with pkgs.ibus-engines; [ hangul ];
-  };
   # swayidle's -w waits for commands to exit. Detach the timeout lock so sleep
   # events cannot queue behind it and re-lock the session after authentication.
   idleLockCommand = "quickshell -n -d -p ~/.config/quickshell/lock/shell.qml";
@@ -99,32 +96,6 @@ in
     ];
   };
 
-  # Keep the Wayland frontend and its XIM bridge in one session-bound cgroup.
-  # Each compositor starts this after exporting its Wayland and X11 displays.
-  # The frontend can exit cleanly when Xwayland disappears, so on-failure is
-  # insufficient here: always restart it while the graphical session is alive.
-  systemd.user.services.ibus-wayland = {
-    Unit = {
-      Description = "IBus Wayland input method frontend";
-      ConditionEnvironment = "WAYLAND_DISPLAY";
-      PartOf = [ "graphical-session.target" ];
-      After = [ "graphical-session.target" ];
-    };
-    Service = {
-      Type = "simple";
-      Slice = "session.slice";
-      Environment = [ "XMODIFIERS=@im=ibus" ];
-      UnsetEnvironment = [
-        "GTK_IM_MODULE"
-        "QT_IM_MODULE"
-      ];
-      ExecStart = "${ibusPackage}/libexec/ibus-ui-gtk3 --enable-wayland-im --exec-daemon --daemon-args \"--xim --panel disable\"";
-      Restart = "always";
-      RestartSec = "3s";
-      TimeoutStopSec = "5s";
-    };
-  };
-
   # Niri session (used on all hosts). Providing a config.kdl replaces niri's
   # built-in defaults, so all binds are spelled out. Mod+L stays as the lock
   # key, so column-right also gets Mod+Semicolon.
@@ -132,8 +103,14 @@ in
     input {
         keyboard {
             xkb {
-                layout "kr"
-                variant "kr104"
+                // fcitx5-hangul maps keysyms to jamo itself and its group
+                // layout is "us", so keep the layout name "us" too: the
+                // old "kr"/kr104 variant would make the compositor and
+                // fcitx5 disagree (and turn the Hangul key into Alt_R).
+                // These options keep the old Korean-key behaviour: right
+                // Alt is Hangul, right Ctrl is Hanja.
+                layout "us"
+                options "korean:ralt_hangul,korean:rctrl_hanja"
             }
         }
     }
@@ -144,10 +121,13 @@ in
     }
 
     environment {
-        XMODIFIERS "@im=ibus"
+        XMODIFIERS "@im=fcitx"
     }
 
-    spawn-at-startup "${pkgs.systemd}/bin/systemctl" "--user" "--no-block" "restart" "ibus-wayland.service"
+    // fcitx5 speaks input-method-v2, so it is the IME for niri's text-input-v3
+    // clients. -d detaches; the next login's spawn is a no-op if one is
+    // already running.
+    spawn-at-startup "fcitx5" "-d"
     spawn-at-startup "sh" "-c" "quickshell -p ~/.config/quickshell/panel/shell.qml"
     spawn-at-startup "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
     spawn-at-startup "nm-applet"
@@ -318,23 +298,8 @@ in
     }
   '';
 
-  # ibus-hangul's event-forwarding workaround consumes Space/Enter and re-sends
-  # them via forward_key_event, which the ibus Wayland IM frontend never
-  # delivers to the client. Disable it so unhandled keys are re-injected
-  # through the compositor's virtual keyboard instead.
-  dconf.settings."org/freedesktop/ibus/engine/hangul" = {
-    use-event-forwarding = false;
-  };
-
   xdg.configFile."quickshell/panel".source = quickshellConfig "panel";
   xdg.configFile."quickshell/lock".source = quickshellConfig "lock";
-
-  xdg.configFile."autostart/ibus-daemon.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=IBus
-    Hidden=true
-  '';
 
   xdg.configFile."foot/foot.ini".text = ''
     [main]
