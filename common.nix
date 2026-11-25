@@ -65,6 +65,12 @@
   services.tumbler.enable = true;
   services.upower.enable = true;
 
+  # Noctalia's Bluetooth and power-profile widgets (bar and Control Center)
+  # read BlueZ and power-profiles-daemon over D-Bus. Note that tuned is an
+  # alternative to power-profiles-daemon, not a companion; it stays disabled.
+  hardware.bluetooth.enable = true;
+  services.power-profiles-daemon.enable = true;
+
   # USB device nodes default to root:root 0664, so non-root users cannot
   # open vendor 2a0e devices read-write.
   services.udev.extraRules = ''

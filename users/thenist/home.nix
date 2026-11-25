@@ -32,6 +32,16 @@
         mode = "dark";
         source = "builtin";
         builtin = "Catppuccin";
+
+        # Noctalia renders its palette into the apps that make sense here:
+        # GTK 3/4 covers most GUI apps (including libadwaita and the widget
+        # colours Firefox picks up), and foot is the terminal. Qt stays on
+        # the GTK3 platform theme below, so it inherits the same GTK colours
+        # without needing qt6ct and a manually selected scheme.
+        templates = {
+          enable_builtin_templates = true;
+          builtin_ids = [ "gtk3" "gtk4" "foot" ];
+        };
       };
 
       wallpaper = {
@@ -79,7 +89,9 @@
           "tray"
           "notifications"
           "network"
+          "bluetooth"
           "volume"
+          "power-profile"
           "battery"
           "control-center"
           "session"
@@ -394,8 +406,13 @@
     }
   '';
 
+  # Noctalia's foot template writes the palette to
+  # ~/.config/foot/themes/noctalia at runtime. The include has to be
+  # declarative because home-manager owns foot.ini as a read-only store
+  # symlink, which Noctalia's apply.sh cannot append to.
   xdg.configFile."foot/foot.ini".text = ''
     [main]
+    include=~/.config/foot/themes/noctalia
     font=JetBrainsMono Nerd Font:size=11
     font-bold=JetBrainsMono Nerd Font:style=Bold:size=11
     font-italic=JetBrainsMono Nerd Font:style=Italic:size=11
@@ -412,9 +429,13 @@
     # which is why apps that ignore gtk-theme-name still render dark.
     colorScheme = "dark";
 
+    # Noctalia's GTK templates (theme.templates above) layer its palette over
+    # the adw-gtk3 base theme, which the Noctalia docs require for GTK 3.
+    # GTK 4 keeps libadwaita's default theme (gtk.gtk4.theme is null at this
+    # stateVersion), so only the noctalia.css import colours GTK 4 apps.
     theme = {
-      name = "WhiteSur-Dark";
-      package = pkgs.whitesur-gtk-theme;
+      name = "adw-gtk3-dark";
+      package = pkgs.adw-gtk3;
     };
 
     iconTheme = {
@@ -424,9 +445,10 @@
   };
 
   # Qt apps ignore the settings portal unless a platform theme is selected;
-  # the GTK3 platform theme makes them take the palette/fonts from WhiteSur-Dark
-  # and follow the color scheme. Sets QT_QPA_PLATFORMTHEME for the session
-  # (systemd user environment) and for login shells.
+  # the GTK3 platform theme makes them take the palette/fonts from the GTK
+  # theme (adw-gtk3-dark + Noctalia's noctalia.css) and follow the colour
+  # scheme. Sets QT_QPA_PLATFORMTHEME for the session (systemd user
+  # environment) and for login shells.
   qt = {
     enable = true;
     platformTheme.name = "gtk3";
