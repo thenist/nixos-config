@@ -150,8 +150,6 @@
      python315
      gcc
      unrar
-      nodejs_24
-      claude-code
       gnumake
       quickshell
       cage
