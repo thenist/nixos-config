@@ -133,6 +133,11 @@
           "0" = "Hangul";
           "1" = "Control+space";
         };
+        # No popup on Korean/English switches. fcitx5's overlay message is
+        # the "Show Input Method Information when switch input method" option;
+        # ShowFirstInputMethodInformation only affects the inactive (English)
+        # half and is moot while this is off.
+        globalOptions.Behavior.ShowInputMethodInformation = false;
         # Default group: US layout plus the Hangul engine. Starting on
         # keyboard-us keeps a fresh session English until the toggle is hit.
         inputMethod = {
