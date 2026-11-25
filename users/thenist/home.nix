@@ -122,6 +122,10 @@ in
 
     environment {
         XMODIFIERS "@im=fcitx"
+        // fcitx5 saves a copy of its config into ~/.config/fcitx5 on exit,
+        // which would shadow the declarative /etc/xdg/fcitx5 config (and did:
+        // it emptied the toggle key). Keep the system config authoritative.
+        SKIP_FCITX_USER_PATH "1"
     }
 
     // fcitx5 speaks input-method-v2, so it is the IME for niri's text-input-v3

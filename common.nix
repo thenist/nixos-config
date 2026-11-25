@@ -113,12 +113,26 @@
     enable = true;
     fcitx5 = {
       waylandFrontend = true;
+      # fcitx5 dumps its own copy of the config into ~/.config/fcitx5 when it
+      # exits, and that copy shadows /etc/xdg/fcitx5 (it is what turned the
+      # toggle key into an empty value). Ignore the user copy so the settings
+      # below stay authoritative.
+      ignoreUserConfig = true;
       addons = with pkgs; [
         fcitx5-hangul
         qt6Packages.fcitx5-configtool
       ];
       settings = {
-        globalOptions.Hotkey.TriggerKeys = "Hangul,Control+space";
+        # fcitx5 stores hotkey *lists* as indexed sub-keys, not as a
+        # comma-separated string, so this has to render as
+        #   [Hotkey/TriggerKeys]
+        #   0=Hangul
+        #   1=Control+space
+        # to match fcitx5's own on-disk format.
+        globalOptions."Hotkey/TriggerKeys" = {
+          "0" = "Hangul";
+          "1" = "Control+space";
+        };
         # Default group: US layout plus the Hangul engine. Starting on
         # keyboard-us keeps a fresh session English until the toggle is hit.
         inputMethod = {
