@@ -7,7 +7,6 @@
     shell = pkgs.zsh;
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-      codex
       prismlauncher
       freecad
       kicad
