@@ -12,17 +12,17 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "oishikunaare-moe-moe-kyun";
-  version = "0.71.2";
+  version = "0.72.0";
 
   src = fetchFromGitHub {
     # Personal fork of the upstream project (Nesarf/Oishikunaare-Moe-Moe-Kyun).
-    # The fork is pinned to the same commit and carries the same contents, so
-    # the hash below is unchanged. Its README and package.json still name the
-    # old owner Nesarf_Mollor, which no longer resolves.
+    # Pinned to the fork's main at the 0.72.0 release, which adds the Korean
+    # locale and the Hangul allow-list fixes. Its README and package.json still
+    # name the old owner Nesarf_Mollor, which no longer resolves.
     owner = "thenist";
     repo = "Oishikunaare-Moe-Moe-Kyun";
-    rev = "70f00a80fc2b83435dedf5a6749e9635b0d1b889";
-    hash = "sha256-lsID0aZgqLIt3Pxh+OTmoCCAh6x8x6zMfXXw/iFXTPk=";
+    rev = "8aa884d0f0ce773f4ec53656168be0cfc4511ee7";
+    hash = "sha256-mMu6AyQUxYfNpl27p8tcrpYDp30xuJHgqmVABIiwx5M=";
   };
 
   dontBuild = true;
