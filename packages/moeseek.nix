@@ -15,13 +15,13 @@
 }:
 stdenv.mkDerivation {
   pname = "moeseek";
-  version = "1.1.0";
+  version = "1.1.1";
 
   src = fetchFromGitHub {
     owner = "thenist";
     repo = "moeseek";
-    rev = "080f1bdd27907db270e6a1b8f1990afaf526f3e5";
-    hash = "sha256-KnWFrR2km+RuDHXucymoIeKf6CFnIyHK8oJuiCqDKfU=";
+    rev = "fd51eb19338d079c3678ffa79734b8450c534133";
+    hash = "sha256-uKbJgxQHWzmplHGkcRKNlHGSzn4RZTOp5oHx/U6GqpM=";
   };
 
   dontBuild = true;
