@@ -467,14 +467,16 @@
 
   # The house-rules plugin reads $DSH_HOME/agent-house-rules.json on every
   # model step, not just at boot, so editing it lands on the next step of
-  # every running session in the moe profile. Only the moe layer is set here:
-  # the packaged English rules and the plugin defaults stay in force. `full`
-  # is the loudest of the three intensities - `soft` sets the tone, `full`
-  # also draws on the six voice tables in rules/voices (one voice is kept per
-  # session, not mixed). Add `moeVoice` to pin (`gentle`, `spirited`, ...) or
-  # rotate a voice, or `moeVoiceByPreset` to map one to a preset id.
+  # every running session in the moe profile. `locale = "ko"` selects the
+  # packaged Korean rule text (0.72.0 ships ko alongside en, zh and ja);
+  # without it the plugin falls back to English. `full` is the loudest of the
+  # three intensities - `soft` sets the tone, `full` also draws on the six
+  # voice tables in rules/voices (one voice is kept per session, not mixed).
+  # Add `moeVoice` to pin (`gentle`, `spirited`, ...) or rotate a voice, or
+  # `moeVoiceByPreset` to map one to a preset id.
   home.file.".dsh/agent-house-rules.json".text = ''
     {
+      "locale": "ko",
       "moe": "full"
     }
   '';
