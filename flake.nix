@@ -49,17 +49,21 @@
       });
     extrasOverlay = _final: prev: {
       solidcraft = tweakSolidcraft prev;
-      # home.nix's activation links this into the `moe` DSH profile, so the
-      # profile mounts a store copy instead of fetching from the plugin's repo.
+      # DSH profile plugins. home.nix's activation links each store copy into
+      # the profiles that mount it, so nothing is fetched at activation time.
       moeseek = prev.callPackage ./packages/moeseek.nix { };
+      dsh-korean-locale = prev.callPackage ./packages/dsh-korean-locale.nix { };
     };
   in {
     packages.x86_64-linux.solidcraft = tweakSolidcraft nixpkgs.legacyPackages.x86_64-linux;
 
-    # Build with `nix build .#moeseek`. Kept as an output as well as an overlay
-    # so the plugin can be built and tested without evaluating a host.
+    # Build with `nix build .#moeseek` or `nix build .#dsh-korean-locale`. Kept
+    # as outputs as well as overlays so each bundle can be built and tested
+    # without evaluating a host.
     packages.x86_64-linux.moeseek =
       nixpkgs.legacyPackages.x86_64-linux.callPackage ./packages/moeseek.nix { };
+    packages.x86_64-linux.dsh-korean-locale =
+      nixpkgs.legacyPackages.x86_64-linux.callPackage ./packages/dsh-korean-locale.nix { };
 
     # use "nixos", or your hostname as the name of the configuration
     # it's a better practice than "default" shown in the video
