@@ -426,23 +426,50 @@
 
   # DSH has no NixOS-level plugin option: a profile is a pnpm project under
   # $DSH_HOME/profiles. The `moe` profile is a scratch layer kept apart from
-  # `web` so an experimental bundle can be mounted without touching the daily
-  # driver: whatever a profile mounts applies to every session in it, so the
-  # experiment stays behind `dsh moe`. Plugins go in with `dsh plugin
-  # --profile moe add <package>`, which is all pnpm plus the profile's
-  # `dsh.profile.bundles` list needs - not through this activation.
+  # `web` so the experimental moeseek bundle can be mounted without touching the
+  # daily driver: whatever a profile mounts applies to every session in it, so
+  # the voice stays behind `dsh moe`.
   #
-  # This activation only bootstraps the profile, from the web profile's patch
-  # file the first time, so it carries the same model and permission settings.
-  # It is idempotent and leaves an existing profile untouched.
+  # Moeseek is declared as a Nix package (packages/moeseek.nix, pinned commit)
+  # and the activation makes the profile mount that store copy: the `link:`
+  # dependency pnpm would record, the symlink pnpm would create under
+  # node_modules, and the name in `dsh.profile.bundles` (the launcher mounts
+  # nothing but the bundles named there). Both steps are idempotent and point at
+  # the store path, so a flake update relinks on the next switch, and bundles
+  # added to the profile with `dsh plugin --profile moe add` keep their entries.
+  #
+  # The profile is created from the web profile's patch file the first time, so
+  # it carries the same model and permission settings; an existing profile's
+  # patch and settings are left untouched.
   home.activation.dshMoeProfile = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     profiles="$HOME/.dsh/profiles"
     profile="$profiles/moe"
+    plugin=${pkgs.moeseek}
     if [ -d "$profiles/web" ] && [ ! -d "$profile" ]; then
       mkdir -p "$profile/node_modules"
       cp "$profiles/web/pnpm-workspace.yaml" "$profile/pnpm-workspace.yaml"
       cp "$profiles/web/cordis.patch.yml" "$profile/cordis.patch.yml"
       printf '{"name":"dsh-profile-moe","private":true}\n' > "$profile/package.json"
+    fi
+    if [ -d "$profiles/web" ] && [ -f "$profile/package.json" ]; then
+      # The package is scoped, so its node_modules entry lives under @local/.
+      link="$profile/node_modules/@local/moeseek"
+      run mkdir -p "$profile/node_modules/@local"
+      run rm -rf "$link"
+      run ln -s "$plugin" "$link"
+
+      tmp="$(mktemp)"
+      ${pkgs.jq}/bin/jq --arg n '@local/moeseek' --arg p "link:$plugin" \
+        '(.dsh.profile.bundles // ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-web-app"]) as $b
+         | .dsh.profile.bundles = (if ($b | index($n)) then $b else $b + [$n] end)
+         | .dsh.profile.patchReload = (.dsh.profile.patchReload // "live")
+         | .dependencies = ((.dependencies // {}) + {($n): $p})' \
+        "$profile/package.json" > "$tmp"
+      if ! cmp -s "$tmp" "$profile/package.json"; then
+        run mv "$tmp" "$profile/package.json"
+      else
+        rm -f "$tmp"
+      fi
     fi
   '';
 

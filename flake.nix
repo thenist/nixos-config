@@ -49,9 +49,17 @@
       });
     extrasOverlay = _final: prev: {
       solidcraft = tweakSolidcraft prev;
+      # home.nix's activation links this into the `moe` DSH profile, so the
+      # profile mounts a store copy instead of fetching from the plugin's repo.
+      moeseek = prev.callPackage ./packages/moeseek.nix { };
     };
   in {
     packages.x86_64-linux.solidcraft = tweakSolidcraft nixpkgs.legacyPackages.x86_64-linux;
+
+    # Build with `nix build .#moeseek`. Kept as an output as well as an overlay
+    # so the plugin can be built and tested without evaluating a host.
+    packages.x86_64-linux.moeseek =
+      nixpkgs.legacyPackages.x86_64-linux.callPackage ./packages/moeseek.nix { };
 
     # use "nixos", or your hostname as the name of the configuration
     # it's a better practice than "default" shown in the video
