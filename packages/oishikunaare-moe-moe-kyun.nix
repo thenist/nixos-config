@@ -15,9 +15,11 @@ stdenv.mkDerivation (finalAttrs: {
   version = "0.71.2";
 
   src = fetchFromGitHub {
-    # The repo is Nesarf/...; the README and package.json still name the old
-    # owner Nesarf_Mollor, which no longer resolves.
-    owner = "Nesarf";
+    # Personal fork of the upstream project (Nesarf/Oishikunaare-Moe-Moe-Kyun).
+    # The fork is pinned to the same commit and carries the same contents, so
+    # the hash below is unchanged. Its README and package.json still name the
+    # old owner Nesarf_Mollor, which no longer resolves.
+    owner = "thenist";
     repo = "Oishikunaare-Moe-Moe-Kyun";
     rev = "70f00a80fc2b83435dedf5a6749e9635b0d1b889";
     hash = "sha256-lsID0aZgqLIt3Pxh+OTmoCCAh6x8x6zMfXXw/iFXTPk=";
@@ -36,13 +38,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Output house rules for every DeepSeek Harness agent, from one global prompt section";
-    homepage = "https://github.com/Nesarf/Oishikunaare-Moe-Moe-Kyun";
+    homepage = "https://github.com/thenist/Oishikunaare-Moe-Moe-Kyun";
     # CZGD-PL-1.1 is a custom licence with no SPDX identifier; npm reports it
     # as NOASSERTION. Permissive in effect (attribution + no impersonation),
     # but not an OSI licence.
     license = {
       fullName = "Cheese Gyudon Public Licence 1.1 (CZGD-PL-1.1)";
-      url = "https://github.com/Nesarf/Oishikunaare-Moe-Moe-Kyun/blob/main/LICENSE";
+      url = "https://github.com/thenist/Oishikunaare-Moe-Moe-Kyun/blob/main/LICENSE";
       free = true;
     };
     platforms = lib.platforms.all;
