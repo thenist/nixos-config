@@ -42,6 +42,13 @@
         size = 24;
       };
 
+      # The greeter's bundled compositor auto-scales from EDID: on this 14"
+      # 1080p panel it computed ~1.66 (advertised as scale 2), while niri runs
+      # the same panel at 1.25, so the login UI was laid out at a coarser
+      # logical size than the session. Pin the laptop panel to match; other
+      # outputs (and hosts) keep automatic scaling.
+      output.scales = "eDP-1:1.25";
+
       # fcitx5 is not running in the greeter and passwords are ASCII, so match
       # the session's base layout to keep key positions predictable.
       keyboard.layout = "us";
