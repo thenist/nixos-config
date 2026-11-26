@@ -9,6 +9,14 @@
   services.displayManager.noctalia-greeter = {
     enable = true;
 
+    # Bottom-anchored login panel and no session picker while niri is the only
+    # session. Upstream 1.7.1 hardcodes both (centered panel, always-visible
+    # session row); the patch fails loudly on a version bump instead of
+    # silently reintroducing them.
+    package = pkgs.noctalia-greeter.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./patches/noctalia-greeter-bottom-login.patch ];
+    });
+
     settings = {
       # Single-user hosts: open directly on the password step.
       session.default = "Niri";
@@ -21,6 +29,8 @@
         # dark surfaces rather than the shell's true-black variant.
         scheme = "Tokyo-Night";
         theme_mode = "dark";
+        # Noctalia's owl brand mark is on by default on the login screen.
+        hide_logo = true;
         wallpaper = {
           # Interpolating the path copies the repo wallpaper into the store.
           # The greeter runs as the unprivileged `greeter` user and cannot

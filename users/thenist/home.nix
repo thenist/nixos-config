@@ -101,6 +101,13 @@
         ];
       };
 
+      # The control-center bar widget defaults to the Noctalia owl glyph;
+      # replace it with a neutral sliders icon. (The launcher widget already
+      # uses the "search" glyph, not the owl.)
+      widget."control-center" = {
+        glyph = "adjustments";
+      };
+
       lockscreen.enabled = true;
     };
   };
