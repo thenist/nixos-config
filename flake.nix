@@ -49,9 +49,15 @@
       });
     extrasOverlay = _final: prev: {
       solidcraft = tweakSolidcraft prev;
+      oishikunaare-moe-moe-kyun = prev.callPackage ./packages/oishikunaare-moe-moe-kyun.nix { };
     };
   in {
     packages.x86_64-linux.solidcraft = tweakSolidcraft nixpkgs.legacyPackages.x86_64-linux;
+
+    # Tried with `nix build .#oishikunaare-moe-moe-kyun`, wired into the web
+    # profile by home.nix's activation.
+    packages.x86_64-linux.oishikunaare-moe-moe-kyun =
+      nixpkgs.legacyPackages.x86_64-linux.callPackage ./packages/oishikunaare-moe-moe-kyun.nix { };
 
     # use "nixos", or your hostname as the name of the configuration
     # it's a better practice than "default" shown in the video

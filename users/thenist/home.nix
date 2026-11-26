@@ -424,6 +424,47 @@
     }
   '';
 
+  # DSH has no NixOS-level plugin option: a profile is a pnpm project under
+  # $DSH_HOME/profiles. `dsh plugin add` only forwards to pnpm, and the launcher
+  # mounts nothing but the bundles named in the profile's `dsh.profile.bundles`
+  # list, so the house-rules plugin needs two things pnpm does not do on its
+  # own: the package visible in the profile's node_modules, and its name in
+  # that list. Both steps are idempotent and point at the store path, so a
+  # flake update relinks on the next switch instead of leaving a stale copy.
+  #
+  # It lives in its own `moe` profile rather than in `web`, because the plugin
+  # registers one system-prompt section for the entire profile it is mounted
+  # in: in `web` every session would pay its 21 KB on every model step, and
+  # here the joke stays optional behind `dsh moe`. The profile is created from
+  # the web profile's patch file the first time, so it carries the same model
+  # and permission settings.
+  home.activation.dshHouseRules = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    profiles="$HOME/.dsh/profiles"
+    profile="$profiles/moe"
+    plugin=${pkgs.oishikunaare-moe-moe-kyun}
+    if [ -d "$profiles/web" ]; then
+      if [ ! -d "$profile" ]; then
+        mkdir -p "$profile/node_modules"
+        cp "$profiles/web/pnpm-workspace.yaml" "$profile/pnpm-workspace.yaml"
+        cp "$profiles/web/cordis.patch.yml" "$profile/cordis.patch.yml"
+        printf '{"name":"dsh-profile-moe","private":true}\n' > "$profile/package.json"
+      fi
+      run ln -sfn "$plugin" "$profile/node_modules/oishikunaare-moe-moe-kyun"
+      tmp="$(mktemp)"
+      ${pkgs.jq}/bin/jq --arg n oishikunaare-moe-moe-kyun --arg p "link:$plugin" \
+        '(.dsh.profile.bundles // ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-web-app"]) as $b
+         | .dsh.profile.bundles = (if ($b | index($n)) then $b else $b + [$n] end)
+         | .dsh.profile.patchReload = (.dsh.profile.patchReload // "live")
+         | .dependencies = ((.dependencies // {}) + {($n): $p})' \
+        "$profile/package.json" > "$tmp"
+      if ! cmp -s "$tmp" "$profile/package.json"; then
+        run mv "$tmp" "$profile/package.json"
+      else
+        rm -f "$tmp"
+      fi
+    fi
+  '';
+
   # Folders opened through xdg-open, FileManager1 or a portal go to Luciole
   # now that Thunar is gone. mimeApps is opt-in in home-manager.
   xdg.mimeApps = {
