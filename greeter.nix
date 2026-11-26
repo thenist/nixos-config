@@ -16,8 +16,10 @@
 
       appearance = {
         # Same palette as the shell (users/thenist/home.nix), so the login
-        # screen and the session it starts look like one system.
-        scheme = "Catppuccin";
+        # screen and the session it starts look like one system. The greeter
+        # has no pure-black switch, so this is Tokyo Night with its normal
+        # dark surfaces rather than the shell's true-black variant.
+        scheme = "Tokyo-Night";
         theme_mode = "dark";
         wallpaper = {
           # Interpolating the path copies the repo wallpaper into the store.

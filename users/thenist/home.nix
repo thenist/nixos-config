@@ -27,11 +27,14 @@
         launch_apps_as_systemd_services = true;
       };
 
-      # Catppuccin matches the old shell's palette and the greeter scheme.
+      # Tokyo Night's deep navy and blue/cyan accents match the wallpaper's
+      # near-black sky and icy crystal; pure_black_dark anchors the surfaces to
+      # true black so the bar melts into that wallpaper.
       theme = {
         mode = "dark";
         source = "builtin";
-        builtin = "Catppuccin";
+        builtin = "Tokyo-Night";
+        pure_black_dark = true;
 
         # Noctalia renders its palette into the apps that make sense here:
         # GTK 3/4 covers most GUI apps (including libadwaita and the widget
