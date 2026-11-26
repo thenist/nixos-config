@@ -20,8 +20,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "thenist";
     repo = "moeseek";
-    rev = "eff55a2f0315dcd389bccc8eae763aa3daf3e5c0";
-    hash = "sha256-N0chSJ70SDopYjagCnQOouOOzy35MoVf0RtKXQgok6M=";
+    rev = "080f1bdd27907db270e6a1b8f1990afaf526f3e5";
+    hash = "sha256-KnWFrR2km+RuDHXucymoIeKf6CFnIyHK8oJuiCqDKfU=";
   };
 
   dontBuild = true;
