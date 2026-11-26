@@ -465,6 +465,20 @@
     fi
   '';
 
+  # The house-rules plugin reads $DSH_HOME/agent-house-rules.json on every
+  # model step, not just at boot, so editing it lands on the next step of
+  # every running session in the moe profile. Only the moe layer is set here:
+  # the packaged English rules and the plugin defaults stay in force. `full`
+  # is the loudest of the three intensities - `soft` sets the tone, `full`
+  # also draws on the six voice tables in rules/voices (one voice is kept per
+  # session, not mixed). Add `moeVoice` to pin (`gentle`, `spirited`, ...) or
+  # rotate a voice, or `moeVoiceByPreset` to map one to a preset id.
+  home.file.".dsh/agent-house-rules.json".text = ''
+    {
+      "moe": "full"
+    }
+  '';
+
   # Folders opened through xdg-open, FileManager1 or a portal go to Luciole
   # now that Thunar is gone. mimeApps is opt-in in home-manager.
   xdg.mimeApps = {
