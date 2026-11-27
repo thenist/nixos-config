@@ -1,7 +1,8 @@
 # Noctalia Greeter, a greetd login screen. It runs its own wlroots compositor
 # and starts the .desktop session named in [session].default (niri ships
-# "Niri"). The desktop shell itself is configured in users/thenist/home.nix;
-# this file only covers the login screen.
+# "Niri"). The desktop shell itself is configured in programs/home/ (its
+# palette lives in programs/home/noctalia.nix); this file only covers the
+# login screen.
 
 { pkgs, ... }:
 
@@ -23,7 +24,7 @@
       user.default = "thenist";
 
       appearance = {
-        # Same palette as the shell (users/thenist/home.nix), so the login
+        # Same palette as the shell (programs/home/noctalia.nix), so the login
         # screen and the session it starts look like one system. The greeter
         # has no pure-black switch, so this is Tokyo Night with its normal
         # dark surfaces rather than the shell's true-black variant.
