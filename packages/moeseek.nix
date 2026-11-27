@@ -15,13 +15,13 @@
 }:
 stdenv.mkDerivation {
   pname = "moeseek";
-  version = "1.1.3";
+  version = "1.2.0";
 
   src = fetchFromGitHub {
     owner = "thenist";
     repo = "moeseek";
-    rev = "53d3e8f886a889cc63d080a7c65a13b1f5a18e88";
-    hash = "sha256-C0UZ4wmpNI45z9uMNPDkS+qV8cl/2bWDsLq/UDJ4PrY=";
+    rev = "ae8b39c547d208ebf445013c5cd3677eb468ce2a";
+    hash = "sha256-kyJEJ/fZsmdpyGWu9hHru9YEVgASBxvAhl0eGHm9s9Q=";
   };
 
   dontBuild = true;
@@ -30,7 +30,7 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
     mkdir -p $out
-    cp -r package.json index.js styles.js client.js cordis.patch.yml \
+    cp -r package.json index.js config.js styles.js client.js cordis.patch.yml \
       icon.svg README.md locale tests $out/
     runHook postInstall
   '';
