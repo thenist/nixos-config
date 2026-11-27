@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ./dev.nix
+  ];
+
   users.users.thenist = {
     isNormalUser = true;
     description = "thenist";

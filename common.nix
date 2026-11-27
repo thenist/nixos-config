@@ -122,10 +122,6 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    # Editing this config from a root shell; thenist's configured vim lives in
-    # programs/home/vim.nix.
-    vim
-
     # Archives and downloads.
     unrar
     unzip
@@ -139,13 +135,6 @@
     foot
     grim
     xwayland-satellite
-
-    # Development toolchain.
-    cargo
-    gcc
-    gnumake
-    python315
-    rustc
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
