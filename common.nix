@@ -122,34 +122,30 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-      vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      wget
-     btop
-     unzip
-     exfat
-     ffmpeg
-     python315
-     gcc
-     unrar
-      gnumake
-      xwayland-satellite
-      xdg-desktop-portal
-      xdg-desktop-portal-gtk
-      xdg-desktop-portal-wlr
-      foot
-      grim
-      slurp
-      wl-clipboard
-      brightnessctl
-      pavucontrol
-      wlr-randr
-      wdisplays
-      adwaita-fonts
-      libnotify
-      playerctl
-      cargo
-      rustc
-      cifs-utils
+    # Editing this config from a root shell; thenist's configured vim lives in
+    # programs/home/vim.nix.
+    vim
+
+    # Archives and downloads.
+    unrar
+    unzip
+    wget
+
+    # Terminal and desktop helpers. foot is spawned by the niri Mod+Return
+    # bind, brightnessctl by the hardware keys, grim backs screenshots.
+    btop
+    brightnessctl
+    ffmpeg
+    foot
+    grim
+    xwayland-satellite
+
+    # Development toolchain.
+    cargo
+    gcc
+    gnumake
+    python315
+    rustc
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
