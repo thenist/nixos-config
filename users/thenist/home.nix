@@ -428,12 +428,12 @@
   # $DSH_HOME/profiles. The `moe` profile is a scratch layer kept apart from
   # `web` so the experimental moeseek voice can be mounted without touching the
   # daily driver: whatever a profile mounts applies to every session in it, so
-  # the voice stays behind `dsh moe`. The Korean locale, by contrast, belongs in
-  # both profiles.
+  # the voice stays behind `dsh moe`. The Korean locale, the archive manager,
+  # and genui, by contrast, belong in both profiles.
   #
-  # Both plugins are declared as Nix packages (packages/*.nix, pinned commits)
-  # and this activation makes each profile mount the store copy: the `link:`
-  # dependency pnpm would record, the symlink pnpm would create under
+  # These plugins are declared as Nix packages (packages/*.nix, pinned
+  # revisions) and this activation makes each profile mount the store copy: the
+  # `link:` dependency pnpm would record, the symlink pnpm would create under
   # node_modules, and the name in `dsh.profile.bundles` (the launcher mounts
   # nothing but the bundles named there). The merge is idempotent, points only
   # at the store path, and keeps bundles added later with `dsh plugin --profile
@@ -477,8 +477,12 @@
     }
 
     linkBundle "$profiles/web" '@nolit/dsh-korean-locale' ${pkgs.dsh-korean-locale}
+    linkBundle "$profiles/web" '@michengai/dsh-archive-manager' ${pkgs.dsh-archive-manager}
+    linkBundle "$profiles/web" '@changfenhuang/dsh-genui' ${pkgs.dsh-genui}
     linkBundle "$profiles/moe" '@local/moeseek' ${pkgs.moeseek}
     linkBundle "$profiles/moe" '@nolit/dsh-korean-locale' ${pkgs.dsh-korean-locale}
+    linkBundle "$profiles/moe" '@michengai/dsh-archive-manager' ${pkgs.dsh-archive-manager}
+    linkBundle "$profiles/moe" '@changfenhuang/dsh-genui' ${pkgs.dsh-genui}
   '';
 
   # Folders opened through xdg-open, FileManager1 or a portal go to Luciole
