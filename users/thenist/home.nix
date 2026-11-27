@@ -1,6 +1,13 @@
 { lib, pkgs, ... }:
 
 {
+  imports = [
+    ../../programs/home/git.nix
+    ../../programs/home/luciole.nix
+    ../../programs/home/vim.nix
+    ../../programs/home/vscode.nix
+  ];
+
   home.username = "thenist";
   home.homeDirectory = "/home/thenist";
   home.stateVersion = "26.11";
@@ -110,53 +117,6 @@
 
       lockscreen.enabled = true;
     };
-  };
-
-  # Noctalia's own file manager, installed by the upstream flake input. The
-  # built-in `luciole` template below writes ~/.config/luciole/colors.toml,
-  # which Luciole reads live (its color_scheme defaults to "auto"). Layout and
-  # behaviour preferences stay in Luciole's GUI-managed settings.toml.
-  programs.luciole = {
-    enable = true;
-  };
-
-  programs.vscode = {
-    enable = true;
-  };
-
-  # GitHub identity (github.com/thenist, owner of this repo's origin).
-  # Home-manager writes this to $XDG_CONFIG_HOME/git/config, which git reads
-  # (XDG_CONFIG_HOME is unset in the session, so it resolves to
-  # ~/.config/git/config). The imperative ~/.gitconfig that lived at the
-  # classic path has been moved to ~/.gitconfig.backup: git gives that file
-  # priority over the XDG one, so leaving it would silently shadow any later
-  # edit here.
-  programs.git = {
-    enable = true;
-    settings = {
-      user.name = "thenist";
-      user.email = "p717394@gmail.com";
-    };
-  };
-
-  programs.vim = {
-    enable = true;
-    plugins = [
-      (pkgs.vimUtils.buildVimPlugin {
-        pname = "42header";
-        version = "unstable-2026-05-13";
-        src = pkgs.fetchFromGitHub {
-          owner = "42Paris";
-          repo = "42header";
-          rev = "0b5698ad1c7cc6d43783419d97c8e6cf97088e64";
-          hash = "sha256-xdH/SeGv1bfKMmJ9cHYd5V+ynFohzprnUC8eVer1VcI=";
-        };
-      })
-    ];
-    extraConfig = ''
-      let g:user42 = 'sumpark'
-      let g:mail42 = 'sumpark@student.42gyeongsan.kr'
-    '';
   };
 
   # oh-my-zsh + powerlevel10k. oh-my-zsh resolves custom themes from
