@@ -27,7 +27,8 @@
   # `web` so the experimental moeseek voice can be mounted without touching the
   # daily driver: whatever a profile mounts applies to every session in it, so
   # the voice stays behind `dsh moe`. The Korean locale, the archive manager,
-  # and genui, by contrast, belong in both profiles.
+  # genui, and the wallet balance indicator, by contrast, belong in both
+  # profiles.
   #
   # These plugins are declared as Nix packages (packages/*.nix, pinned
   # revisions) and this activation makes each profile mount the store copy: the
@@ -77,10 +78,12 @@
     linkBundle "$profiles/web" '@nolit/dsh-korean-locale' ${pkgs.dsh-korean-locale}
     linkBundle "$profiles/web" '@michengai/dsh-archive-manager' ${pkgs.dsh-archive-manager}
     linkBundle "$profiles/web" '@changfenhuang/dsh-genui' ${pkgs.dsh-genui}
+    linkBundle "$profiles/web" '@local/dsh-wallet' ${pkgs.dsh-wallet}
     linkBundle "$profiles/moe" '@local/moeseek' ${pkgs.moeseek}
     linkBundle "$profiles/moe" '@nolit/dsh-korean-locale' ${pkgs.dsh-korean-locale}
     linkBundle "$profiles/moe" '@michengai/dsh-archive-manager' ${pkgs.dsh-archive-manager}
     linkBundle "$profiles/moe" '@changfenhuang/dsh-genui' ${pkgs.dsh-genui}
+    linkBundle "$profiles/moe" '@local/dsh-wallet' ${pkgs.dsh-wallet}
   '';
 
   # Folders opened through xdg-open, FileManager1 or a portal go to Luciole

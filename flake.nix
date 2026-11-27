@@ -55,14 +55,15 @@
       dsh-korean-locale = prev.callPackage ./packages/dsh-korean-locale.nix { };
       dsh-archive-manager = prev.callPackage ./packages/dsh-archive-manager.nix { };
       dsh-genui = prev.callPackage ./packages/dsh-genui.nix { };
+      dsh-wallet = prev.callPackage ./packages/dsh-wallet.nix { };
     };
   in {
     packages.x86_64-linux.solidcraft = tweakSolidcraft nixpkgs.legacyPackages.x86_64-linux;
 
     # Build with `nix build .#moeseek`, `nix build .#dsh-korean-locale`,
-    # `nix build .#dsh-archive-manager`, or `nix build .#dsh-genui`. Kept as
-    # outputs as well as overlays so each bundle can be built and tested without
-    # evaluating a host.
+    # `nix build .#dsh-archive-manager`, `nix build .#dsh-genui`, or
+    # `nix build .#dsh-wallet`. Kept as outputs as well as overlays so each
+    # bundle can be built and tested without evaluating a host.
     packages.x86_64-linux.moeseek =
       nixpkgs.legacyPackages.x86_64-linux.callPackage ./packages/moeseek.nix { };
     packages.x86_64-linux.dsh-korean-locale =
@@ -71,6 +72,8 @@
       nixpkgs.legacyPackages.x86_64-linux.callPackage ./packages/dsh-archive-manager.nix { };
     packages.x86_64-linux.dsh-genui =
       nixpkgs.legacyPackages.x86_64-linux.callPackage ./packages/dsh-genui.nix { };
+    packages.x86_64-linux.dsh-wallet =
+      nixpkgs.legacyPackages.x86_64-linux.callPackage ./packages/dsh-wallet.nix { };
 
     # use "nixos", or your hostname as the name of the configuration
     # it's a better practice than "default" shown in the video
