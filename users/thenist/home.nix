@@ -14,6 +14,7 @@
     ../../programs/home/noctalia.nix
     ../../programs/home/vim.nix
     ../../programs/home/vscode.nix
+    ../../programs/home/zed.nix
     ../../programs/home/zsh.nix
   ];
 
